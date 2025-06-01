@@ -128,7 +128,7 @@
         huyenList.forEach(code => {
           const opt = document.createElement('option');
           opt.value = code;
-          opt.textContent = districtMap[code] || code;
+          opt.textContent = code + ' - ' + (districtMap[code] || '');
           huyenSelect.appendChild(opt);
         });
 
@@ -141,7 +141,7 @@
             xaTheoHuyen[huyen].forEach(xaCode => {
               const opt = document.createElement('option');
               opt.value = xaCode;
-              opt.textContent = wardMap[xaCode] || xaCode;
+              opt.textContent = xaCode + ' - ' + (wardMap[xaCode] || '');
               xaSelect.appendChild(opt);
             });
           }
@@ -201,8 +201,8 @@
           let totalTongSo = 0, totalThieuCCCD = 0, totalThieuChuHo = 0, totalThieuCaHai = 0;
           filtered.forEach(d => {
             const tr = document.createElement('tr');
-            const huyenName = districtMap[d.Huyen] || d.Huyen;
-            const xaName    = wardMap[d.XaPhuong] || d.XaPhuong;
+            const huyenName = d.Huyen + ' - ' + (districtMap[d.Huyen] || '');
+            const xaName    = d.XaPhuong + ' - ' + (wardMap[d.XaPhuong] || '');
             [huyenName, xaName, d.TongSo, d.ThieuCCCD, d.ThieuChuHo, d.ThieuCaHai, d.TyLeThieuCCCD].forEach(val => {
               const td = document.createElement('td');
               td.textContent = val;
@@ -239,7 +239,7 @@
           barChart = new Chart(document.getElementById('barChart'), {
             type: 'bar',
             data: {
-              labels: Array.from(huyenSet).map(code => districtMap[code] || code),
+              labels: Array.from(huyenSet).map(code => code + ' - ' + (districtMap[code] || '')),
               datasets: [{
                 label: '% Thiếu CCCD theo huyện',
                 data: barData,
@@ -270,7 +270,7 @@
                   display: true,
                   text: selectedHuyen === 'all'
                     ? 'Tỷ lệ thiếu CCCD toàn tỉnh'
-                    : 'Tỷ lệ thiếu CCCD tại ' + (districtMap[selectedHuyen] || selectedHuyen)
+                    : 'Tỷ lệ thiếu CCCD tại ' + (districtMap[selectedHuyen] ? (selectedHuyen + ' - ' + districtMap[selectedHuyen]) : selectedHuyen)
                 }
               }
             }
