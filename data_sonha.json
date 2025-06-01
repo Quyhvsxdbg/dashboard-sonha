@@ -1,0 +1,38 @@
+[
+  {
+    "Huyen": "H02",
+    "XaPhuong": "DP049",
+    "TongSo": 545,
+    "ThieuCCCD": 213,
+    "ThieuChuHo": 6,
+    "ThieuCaHai": 6,
+    "TyLeThieuCCCD": 39.1
+  },
+  {
+    "Huyen": "H03",
+    "XaPhuong": "DP061",
+    "TongSo": 223,
+    "ThieuCCCD": 43,
+    "ThieuChuHo": 1,
+    "ThieuCaHai": 1,
+    "TyLeThieuCCCD": 19.3
+  },
+  {
+    "Huyen": "H04",
+    "XaPhuong": "DP071",
+    "TongSo": 265,
+    "ThieuCCCD": 0,
+    "ThieuChuHo": 0,
+    "ThieuCaHai": 0,
+    "TyLeThieuCCCD": 0.0
+  },
+  {
+    "Huyen": "H09",
+    "XaPhuong": "DP171",
+    "TongSo": 2809,
+    "ThieuCCCD": 1106,
+    "ThieuChuHo": 0,
+    "ThieuCaHai": 0,
+    "TyLeThieuCCCD": 39.4
+  }
+]
