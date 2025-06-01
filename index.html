@@ -1,41 +1,69 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
   <title>Dashboard Số nhà tỉnh Bắc Giang</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { background-color: #f8f9fa; }
-    #map { height: 400px; }
     .table-responsive { max-height: 400px; overflow-y: auto; }
+    #barChart, #pieChart { background-color: white; border: 1px solid #ddd; padding: 10px; }
   </style>
 </head>
 <body class="container my-4">
-  <h2 class="text-center mb-3">📍 DASHBOARD SỐ NHÀ TOÀN TỈNH BẮC GIANG</h2>
-  <p class="text-center text-muted mb-4">Cập nhật dữ liệu số hóa số nhà qua dữ liệu JSON</p>
 
+  <h2 class="text-center mb-3">📍 DASHBOARD SỐ NHÀ TOÀN TỈNH BẮC GIANG</h2>
+  <p class="text-center text-muted mb-4">Cập nhật dữ liệu số hóa số nhà qua JSON động</p>
+
+  <!-- 1. Khai báo mapping mã → tên -->
+  <script>
+    // Ánh xạ mã huyện → tên huyện
+    const districtMap = {
+      "H02": "Hiệp Hòa",
+      "H03": "Tân Yên",
+      "H04": "Yên Thế",
+      "H09": "Lạng Giang"
+      // … thêm các mã/huyện khác nếu cần
+    };
+
+    // Ánh xạ mã xã/phường → tên xã/phường
+    const wardMap = {
+      "DP049": "TT. Cao Thượng",
+      "DP061": "Ngọc Lý",
+      "DP071": "Việt Lập",
+      "DP171": "Đại Đức"
+      // … thêm các mã/xã khác nếu cần
+    };
+  </script>
+
+  <!-- 2. Tổng quan toàn tỉnh (bảng) -->
   <h4>I. Tổng quan toàn tỉnh</h4>
   <table class="table table-bordered table-sm w-auto mb-4">
     <thead class="table-light">
       <tr><th>Chỉ tiêu</th><th>Giá trị</th><th>Ghi chú</th></tr>
     </thead>
     <tbody id="summaryTableBody">
-      <!-- Nội dung sẽ được chèn động -->
+      <!-- Dữ liệu sẽ đổ vào đây theo JavaScript -->
     </tbody>
   </table>
 
+  <!-- 3. Biểu đồ so sánh và biểu đồ tròn -->
   <div class="row mb-5">
     <div class="col-md-6">
-      <canvas id="barChart"></canvas>
+      <h5 class="text-center">Biểu đồ cột: % Thiếu CCCD theo huyện</h5>
+      <canvas id="barChart" width="400" height="300"></canvas>
     </div>
     <div class="col-md-6">
-      <canvas id="pieChart"></canvas>
+      <h5 class="text-center">Biểu đồ tròn: Tỷ lệ thiếu CCCD</h5>
+      <canvas id="pieChart" width="400" height="300"></canvas>
     </div>
   </div>
 
+  <!-- 4. Bộ lọc động: Huyện → Xã/Phường -->
   <h4>II. Bộ lọc địa bàn</h4>
   <div class="row mb-4">
     <div class="col-md-4 mb-2">
@@ -52,6 +80,7 @@
     </div>
   </div>
 
+  <!-- 5. Bảng chi tiết theo xã/phường -->
   <h4>III. Bảng chi tiết theo xã/phường</h4>
   <div class="table-responsive mb-4">
     <table id="detailTable" class="table table-bordered table-striped">
@@ -62,7 +91,7 @@
         </tr>
       </thead>
       <tbody id="detailTableBody">
-        <!-- Dữ liệu động -->
+        <!-- Dữ liệu động sẽ đổ vào đây -->
       </tbody>
       <tfoot class="table-light fw-bold">
         <tr>
@@ -77,16 +106,14 @@
     </table>
   </div>
 
-  <footer class="text-center text-muted mb-4">
-    © Trung tâm Dữ liệu – Sở Xây dựng tỉnh Bắc Giang
-  </footer>
-
+  <!-- 6. JavaScript hiển thị dữ liệu động -->
   <script>
-    // Đọc dữ liệu JSON
+    let barChart, pieChart;
+
     fetch('data_sonha.json')
       .then(res => res.json())
       .then(data => {
-        // Tạo danh sách Huyện và Xã
+        // 6.1. Lấy danh sách mã huyện duy nhất và mapping xã
         const huyenSet = new Set();
         const xaTheoHuyen = {};
         data.forEach(item => {
@@ -94,42 +121,40 @@
           if (!xaTheoHuyen[item.Huyen]) xaTheoHuyen[item.Huyen] = new Set();
           xaTheoHuyen[item.Huyen].add(item.XaPhuong);
         });
+        const huyenList = Array.from(huyenSet);
 
-        // Điền dropdown Huyện
+        // 6.2. Điền dropdown Huyện
         const huyenSelect = document.getElementById('huyenSelect');
-        huyenSet.forEach(h => {
+        huyenList.forEach(code => {
           const opt = document.createElement('option');
-          opt.value = h; opt.textContent = h;
+          opt.value = code;
+          opt.textContent = districtMap[code] || code;
           huyenSelect.appendChild(opt);
         });
 
-        // Function cập nhật dropdown Xã
+        // 6.3. Cập nhật dropdown Xã khi chọn Huyện
         function updateXaOptions() {
           const huyen = huyenSelect.value;
           const xaSelect = document.getElementById('xaSelect');
           xaSelect.innerHTML = '<option value="all">Tất cả</option>';
           if (huyen !== 'all') {
-            xaTheoHuyen[huyen].forEach(x => {
+            xaTheoHuyen[huyen].forEach(xaCode => {
               const opt = document.createElement('option');
-              opt.value = x; opt.textContent = x;
+              opt.value = xaCode;
+              opt.textContent = wardMap[xaCode] || xaCode;
               xaSelect.appendChild(opt);
             });
           }
         }
-
         huyenSelect.addEventListener('change', () => {
           updateXaOptions();
+          renderSummary();
           renderDetailTable();
           renderCharts();
-          renderSummary();
         });
+        document.getElementById('xaSelect').addEventListener('change', renderDetailTable);
 
-        // Xử lý khi chọn Xã
-        document.getElementById('xaSelect').addEventListener('change', () => {
-          renderDetailTable();
-        });
-
-        // Hàm tính và hiển thị tổng quan toàn tỉnh
+        // 6.4. Hàm render Tổng quan
         function renderSummary() {
           const summaryBody = document.getElementById('summaryTableBody');
           summaryBody.innerHTML = '';
@@ -138,14 +163,12 @@
           if (selectedHuyen !== 'all') {
             filtered = filtered.filter(d => d.Huyen === selectedHuyen);
           }
-          // Tính tổng
           const soXa = new Set(filtered.map(d => d.XaPhuong)).size;
           const tongHo = filtered.reduce((sum, d) => sum + d.TongSo, 0);
           const thieuCCCD = filtered.reduce((sum, d) => sum + d.ThieuCCCD, 0);
           const thieuChuHo = filtered.reduce((sum, d) => sum + d.ThieuChuHo, 0);
           const thieuCaHai = filtered.reduce((sum, d) => sum + d.ThieuCaHai, 0);
           const tyLe = tongHo ? ((thieuCCCD / tongHo) * 100).toFixed(1) + '%' : '0%';
-
           const rows = [
             ['Số xã/phường đã có dữ liệu', soXa, ''],
             ['Tổng số bản ghi', tongHo, ''],
@@ -156,16 +179,16 @@
           ];
           rows.forEach(r => {
             const tr = document.createElement('tr');
-            r.forEach(cell => {
+            r.forEach(val => {
               const td = document.createElement('td');
-              td.textContent = cell;
+              td.textContent = val;
               tr.appendChild(td);
             });
             summaryBody.appendChild(tr);
           });
         }
 
-        // Hàm hiển thị bảng chi tiết
+        // 6.5. Hàm render Bảng chi tiết
         function renderDetailTable() {
           const tbody = document.getElementById('detailTableBody');
           tbody.innerHTML = '';
@@ -178,9 +201,11 @@
           let totalTongSo = 0, totalThieuCCCD = 0, totalThieuChuHo = 0, totalThieuCaHai = 0;
           filtered.forEach(d => {
             const tr = document.createElement('tr');
-            ['Huyen', 'XaPhuong', 'TongSo', 'ThieuCCCD', 'ThieuChuHo', 'ThieuCaHai', 'TyLeThieuCCCD'].forEach(key => {
+            const huyenName = districtMap[d.Huyen] || d.Huyen;
+            const xaName    = wardMap[d.XaPhuong] || d.XaPhuong;
+            [huyenName, xaName, d.TongSo, d.ThieuCCCD, d.ThieuChuHo, d.ThieuCaHai, d.TyLeThieuCCCD].forEach(val => {
               const td = document.createElement('td');
-              td.textContent = d[key];
+              td.textContent = val;
               tr.appendChild(td);
             });
             tbody.appendChild(tr);
@@ -189,26 +214,23 @@
             totalThieuChuHo += d.ThieuChuHo;
             totalThieuCaHai += d.ThieuCaHai;
           });
-
           document.getElementById('totalTongSo').textContent = totalTongSo;
           document.getElementById('totalThieuCCCD').textContent = totalThieuCCCD;
           document.getElementById('totalThieuChuHo').textContent = totalThieuChuHo;
           document.getElementById('totalThieuCaHai').textContent = totalThieuCaHai;
-          document.getElementById('totalTyLeThieuCCCD').textContent = totalTongSo ? ((totalThieuCCCD / totalTongSo) * 100).toFixed(1) + '%' : '0%';
+          const tyLeTong = totalTongSo ? ((totalThieuCCCD / totalTongSo) * 100).toFixed(1) + '%' : '0%';
+          document.getElementById('totalTyLeThieuCCCD').textContent = tyLeTong;
         }
 
-        // Hàm vẽ biểu đồ
-        let barChart, pieChart;
+        // 6.6. Hàm render Biểu đồ
         function renderCharts() {
           const selectedHuyen = huyenSelect.value;
-          let filtered = data;
-          if (selectedHuyen !== 'all') {
-            filtered = filtered.filter(d => d.Huyen === selectedHuyen);
-          }
-          // Biểu đồ cột theo Huyện
-          const huyenList = Array.from(huyenSet);
-          const barData = huyenList.map(h => {
-            const arr = data.filter(d => d.Huyen === h);
+          let filteredChart = data;
+          if (selectedHuyen !== 'all') filteredChart = filteredChart.filter(d => d.Huyen === selectedHuyen);
+
+          // Bar Chart: % Thiếu CCCD theo huyện
+          const barData = Array.from(huyenSet).map(code => {
+            const arr = data.filter(d => d.Huyen === code);
             const tong = arr.reduce((sum, d) => sum + d.TongSo, 0);
             const thieu = arr.reduce((sum, d) => sum + d.ThieuCCCD, 0);
             return tong ? ((thieu / tong) * 100).toFixed(1) : 0;
@@ -217,7 +239,7 @@
           barChart = new Chart(document.getElementById('barChart'), {
             type: 'bar',
             data: {
-              labels: huyenList,
+              labels: Array.from(huyenSet).map(code => districtMap[code] || code),
               datasets: [{
                 label: '% Thiếu CCCD theo huyện',
                 data: barData,
@@ -229,9 +251,9 @@
             }
           });
 
-          // Biểu đồ tròn toàn tỉnh hoặc theo Huyện
-          const total = filtered.reduce((sum, d) => sum + d.TongSo, 0);
-          const totalThieu = filtered.reduce((sum, d) => sum + d.ThieuCCCD, 0);
+          // Pie Chart: Tỷ lệ Thiếu CCCD (toàn tỉnh hoặc theo huyện)
+          const total = filteredChart.reduce((sum, d) => sum + d.TongSo, 0);
+          const totalThieu = filteredChart.reduce((sum, d) => sum + d.ThieuCCCD, 0);
           if (pieChart) pieChart.destroy();
           pieChart = new Chart(document.getElementById('pieChart'), {
             type: 'pie',
@@ -246,14 +268,16 @@
               plugins: {
                 title: {
                   display: true,
-                  text: selectedHuyen === 'all' ? 'Tỷ lệ thiếu CCCD toàn tỉnh' : 'Tỷ lệ thiếu CCCD tại ' + selectedHuyen
+                  text: selectedHuyen === 'all'
+                    ? 'Tỷ lệ thiếu CCCD toàn tỉnh'
+                    : 'Tỷ lệ thiếu CCCD tại ' + (districtMap[selectedHuyen] || selectedHuyen)
                 }
               }
             }
           });
         }
 
-        // Khởi tạo
+        // 6.7. Khởi tạo lần đầu
         updateXaOptions();
         renderSummary();
         renderDetailTable();
@@ -261,5 +285,6 @@
       })
       .catch(err => console.error('Lỗi tải dữ liệu:', err));
   </script>
+
 </body>
 </html>
