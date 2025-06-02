@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> BÁO CÁO TỔNG HỢP HIỆN TRẠNG SỐ NHÀ TOÀN TỈNH BẮC GIANG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Thêm SheetJS để xuất Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-blue-600 text-white shadow-lg">
+        <div class="container mx-auto px-6 py-4">
+            <h1 class="text-3xl font-bold text-center"> BÁO CÁO TỔNG HỢP HIỆN TRẠNG SỐ NHÀ TOÀN TỈNH BẮC GIANG</h1>
+        </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="bg-white shadow-md">
+        <div class="container mx-auto px-6">
+            <div class="flex space-x-8 justify-center">
+                <button id="tabTongQuan" class="nav-tab py-4 px-6 border-b-2 border-blue-500 text-blue-600 font-medium">
+                    Toàn tỉnh
+                </button>
+                <button id="tabBaoCao"
+                    class="nav-tab py-4 px-6 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
+                    Số nhà
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Tab Content: Tổng quan toàn tỉnh -->
+    <div id="contentTongQuan" class="tab-content">
+        <!-- Navigation Filters for Overview -->
+        <div class="bg-gray-100 border-b">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex flex-wrap gap-4 items-center justify-center">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium text-gray-700">Chọn Huyện:</label>
+                        <select id="huyenSelectOverview"
+                            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tất cả Huyện</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button id="exportOverviewBtn"
+                            class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            Xuất tổng quan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content for Overview -->
+        <main class="container mx-auto px-6 py-8">
+            <!-- Overview Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Tổng số Huyện</h3>
+                            <p class="text-3xl font-bold text-gray-900" id="tongSoHuyen">0</p>
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-6m-2-5h6m-6 0V9m0 4h6m-6 0h6">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Tổng số Xã</h3>
+                            <p class="text-3xl font-bold text-gray-900" id="tongSoXa">0</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Xã có dữ liệu</h3>
+                            <p class="text-3xl font-bold text-green-600" id="xaCoDuLieu">0</p>
+                            <p class="text-sm text-gray-500" id="tyLeXaCoDuLieu">0%</p>
+                        </div>
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Xã chưa có dữ liệu
+                            </h3>
+                            <p class="text-3xl font-bold text-red-600" id="xaChuaCoDuLieu">0</p>
+                            <p class="text-sm text-gray-500" id="tyLeXaChuaCoDuLieu">0%</p>
+                        </div>
+                        <div class="bg-red-100 p-3 rounded-full">
+                            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section for Overview -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Completion Rate Chart -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Tỷ lệ hoàn thành thu thập dữ liệu theo Huyện
+                    </h3>
+                    <div class="relative h-64">
+                        <canvas id="completionChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Progress Bar Chart -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Tiến độ thu thập dữ liệu</h3>
+                    <div class="relative h-64">
+                        <canvas id="progressChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- District Overview Table - ENHANCED VERSION -->
+            <div class="bg-white rounded-lg shadow-md mb-8">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">I. TỔNG QUAN TOÀN TỈNH THEO HUYỆN</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Huyện</th>
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tổng xã</th>
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Xã có dữ liệu</th>
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tỷ lệ (%)</th>
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Hộ đã ghi nhận</th>
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Thiếu CCCD</th>
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tỷ lệ thiếu CCCD (%)</th>
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Thiếu Chủ hộ</th>
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tỷ lệ thiếu Chủ hộ (%)</th>
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Thiếu cả hai</th>
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tỷ lệ thiếu cả hai (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overviewTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Detailed Commune Status -->
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900">Chi tiết trạng thái thu thập dữ liệu theo Xã</h3>
+                </div>
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    STT</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Xã/Phường</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Huyện</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Trạng thái</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Số nhà có dữ liệu</th>
+                            </tr>
+                        </thead>
+                        <tbody id="communeStatusTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Tab Content: Báo cáo số nhà (existing content) -->
+    <div id="contentBaoCao" class="tab-content hidden">
+        <!-- Navigation Filters -->
+        <div class="bg-white shadow-md">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex flex-wrap gap-4 items-center justify-center">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium text-gray-700">Chọn Huyện:</label>
+                        <select id="huyenSelect"
+                            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tất cả Huyện</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium text-gray-700">Chọn Xã:</label>
+                        <select id="xaSelect"
+                            class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Tất cả Xã</option>
+                        </select>
+                    </div>
+
+                    <!-- Thêm các nút xuất Excel -->
+                    <div class="flex items-center gap-2">
+                        <button id="exportSummaryBtn"
+                            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            Xuất Tổng hợp
+                        </button>
+
+                        <button id="exportDetailBtn"
+                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            Xuất Chi tiết thiếu
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-6 py-8">
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Tổng số nhà</h3>
+                            <p class="text-3xl font-bold text-gray-900" id="tongSoNha">0</p>
+                        </div>
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Thiếu CCCD</h3>
+                            <p class="text-3xl font-bold text-red-600" id="thieuCCCD">0</p>
+                            <p class="text-sm text-gray-500" id="tyLeThieuCCCD">0%</p>
+                        </div>
+                        <div class="bg-red-100 p-3 rounded-full">
+                            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Thiếu Chủ hộ</h3>
+                            <p class="text-3xl font-bold text-yellow-600" id="thieuChuHo">0</p>
+                            <p class="text-sm text-gray-500" id="tyLeThieuChuHo">0%</p>
+                        </div>
+                        <div class="bg-yellow-100 p-3 rounded-full">
+                            <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Thiếu cả hai</h3>
+                            <p class="text-3xl font-bold text-purple-600" id="thieuCaHai">0</p>
+                            <p class="text-sm text-gray-500" id="tyLeThieuCaHai">0%</p>
+                        </div>
+                        <div class="bg-purple-100 p-3 rounded-full">
+                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Pie Chart -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Tỷ lệ thiếu thông tin</h3>
+                    <div class="relative h-64">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bar Chart -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Số nhà theo Huyện</h3>
+                    <div class="relative h-64">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Tables Section -->
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
+                <!-- Summary Table by District -->
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Tổng hợp theo Huyện</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Huyện</th>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Tổng số</th>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Thiếu CCCD</th>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Thiếu Chủ hộ</th>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Thiếu cả hai</th>
+                                </tr>
+                            </thead>
+                            <tbody id="huyenTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Detail Table by Commune -->
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900">Chi tiết theo Xã</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Xã</th>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Huyện</th>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Tổng số</th>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Thiếu CCCD</th>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Thiếu Chủ hộ</th>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Thiếu cả hai</th>
+                                </tr>
+                            </thead>
+                            <tbody id="xaTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Lists Section -->
+            <div class="space-y-8">
+                <!-- Danh sách thiếu CCCD -->
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-red-600">Danh sách chi tiết nhà thiếu CCCD</h3>
+                        <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium"
+                            id="countThieuCCCD">0 nhà</span>
+                    </div>
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-red-50 sticky top-0">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        STT</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Số nhà</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Địa chỉ</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Xã</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Huyện</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Chủ hộ</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody id="danhSachThieuCCCD" class="bg-white divide-y divide-gray-200">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Danh sách thiếu Chủ hộ -->
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-yellow-600">Danh sách chi tiết nhà thiếu Chủ hộ</h3>
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium"
+                            id="countThieuChuHo">0 nhà</span>
+                    </div>
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-yellow-50 sticky top-0">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        STT</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Số nhà</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Địa chỉ</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Xã</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Huyện</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        CCCD</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody id="danhSachThieuChuHo" class="bg-white divide-y divide-gray-200">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Danh sách thiếu cả hai -->
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-purple-600">Danh sách chi tiết nhà thiếu cả CCCD và Chủ hộ
+                        </h3>
+                        <span class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium"
+                            id="countThieuCaHai">0 nhà</span>
+                    </div>
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-purple-50 sticky top-0">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        STT</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Số nhà</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Địa chỉ</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Xã</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Huyện</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Trường thiếu</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody id="danhSachThieuCaHai" class="bg-white divide-y divide-gray-200">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto px-6 py-4">
+            <p class="text-center text-sm">&copy; 2025 Hệ thống Quản lý số nhà. Copyright by Quý Hoàng.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Cấu hình API AppSheet
+        const appId = '738e08f5-2238-4a86-aa66-669a26a32787';
+        const accessKey = 'V2-tpO1H-pGDbB-0QG0R-IRLVd-zaLwD-inB4d-6JPu0-zaKuG';
+        const region = 'www';
+
+        // Biến lưu trữ dữ liệu
+        let soNhaData = [];
+        let huyenData = [];
+        let xaPhuongData = [];
+
+        // Chart instances
+        let pieChart, barChart, completionChart, progressChart;
+
+        // Helper functions để kiểm tra dữ liệu trống
+        function isBlank(value) {
+            return value === null || value === undefined || value === '' || value === 'null' || value === 'undefined';
+        }
+
+        function isNotBlank(value) {
+            return !isBlank(value);
+        }
+
+        // Tab switching functionality
+        function initTabs() {
+            const tabTongQuan = document.getElementById('tabTongQuan');
+            const tabBaoCao = document.getElementById('tabBaoCao');
+            const contentTongQuan = document.getElementById('contentTongQuan');
+            const contentBaoCao = document.getElementById('contentBaoCao');
+
+            tabTongQuan.addEventListener('click', () => {
+                // Switch active tab
+                tabTongQuan.classList.add('border-blue-500', 'text-blue-600');
+                tabTongQuan.classList.remove('border-transparent', 'text-gray-500');
+                tabBaoCao.classList.add('border-transparent', 'text-gray-500');
+                tabBaoCao.classList.remove('border-blue-500', 'text-blue-600');
+
+                // Switch content
+                contentTongQuan.classList.remove('hidden');
+                contentBaoCao.classList.add('hidden');
+
+                // Update overview data
+                updateOverviewData();
+            });
+
+            tabBaoCao.addEventListener('click', () => {
+                // Switch active tab
+                tabBaoCao.classList.add('border-blue-500', 'text-blue-600');
+                tabBaoCao.classList.remove('border-transparent', 'text-gray-500');
+                tabTongQuan.classList.add('border-transparent', 'text-gray-500');
+                tabTongQuan.classList.remove('border-blue-500', 'text-blue-600');
+
+                // Switch content
+                contentBaoCao.classList.remove('hidden');
+                contentTongQuan.classList.add('hidden');
+
+                // Update report data
+                updateData();
+            });
+        }
+
+        // Function to make API requests
+        function apiRequest(tableName, action, data) {
+            const apiUrl = `https://${region}.appsheet.com/api/v2/apps/${appId}/tables/${tableName}/Action`;
+            return fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'ApplicationAccessKey': accessKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    Action: action,
+                    Properties: {},
+                    ...data
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .catch(error => {
+                    console.error("Lỗi API:", error);
+                    throw error;
+                });
+        }
+
+        // Fetch data functions
+        async function fetchSoNhaData() {
+            try {
+                const response = await apiRequest('DM_SoNha', 'Find', {
+                    Selector: "Filter(DM_SoNha, true)"
+                });
+                if (!Array.isArray(response) || response.length === 0) {
+                    throw new Error("Dữ liệu không hợp lệ");
+                }
+                soNhaData = response;
+                console.log("Dữ liệu từ DM_SoNha:", soNhaData);
+
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu từ DM_SoNha:", error);
+            }
+        }
+
+        async function fetchHuyenData() {
+            try {
+                const response = await apiRequest('DM_Huyen', 'Find', {
+                    Selector: "Filter(DM_Huyen, true)"
+                });
+                huyenData = response || [];
+                console.log("Dữ liệu từ DM_Huyen:", huyenData);
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu từ DM_Huyen:", error);
+            }
+        }
+
+        async function fetchXaPhuongData() {
+            try {
+                const response = await apiRequest('DM_XaPhuong', 'Find', {
+                    Selector: "Filter(DM_XaPhuong, true)"
+                });
+                xaPhuongData = response || [];
+                console.log("Dữ liệu từ DM_XaPhuong:", xaPhuongData);
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu từ DM_XaPhuong:", error);
+            }
+        }
+
+        // NEW FUNCTIONS FOR OVERVIEW TAB
+
+        // Populate overview filters
+        function populateOverviewFilters() {
+            const huyenSelectOverview = document.getElementById('huyenSelectOverview');
+            huyenSelectOverview.innerHTML = '<option value="">Tất cả Huyện</option>';
+
+            const huyenList = [...new Set(huyenData.map(item => item.MaHuyen))].filter(Boolean);
+            huyenList.forEach(maHuyen => {
+                const huyenInfo = huyenData.find(h => h.MaHuyen === maHuyen);
+                const option = document.createElement('option');
+                option.value = maHuyen;
+                option.textContent = huyenInfo ? huyenInfo.QuanHuyen : maHuyen;
+                huyenSelectOverview.appendChild(option);
+            });
+        }
+
+        // Initialize overview charts
+        function initOverviewCharts() {
+            const completionCtx = document.getElementById('completionChart').getContext('2d');
+            completionChart = new Chart(completionCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Tỷ lệ hoàn thành (%)',
+                        data: [],
+                        backgroundColor: '#3B82F6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            const progressCtx = document.getElementById('progressChart').getContext('2d');
+            progressChart = new Chart(progressCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Xã có dữ liệu', 'Xã chưa có dữ liệu'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: ['#10B981', '#EF4444']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update overview data
+        function updateOverviewData() {
+            const huyenFilter = document.getElementById('huyenSelectOverview').value;
+
+            // Get filtered communes and districts
+            let filteredXaPhuong = xaPhuongData;
+            let filteredHuyen = huyenData;
+
+            if (huyenFilter) {
+                filteredXaPhuong = xaPhuongData.filter(xa => xa.MaHuyen === huyenFilter);
+                filteredHuyen = huyenData.filter(h => h.MaHuyen === huyenFilter);
+            }
+
+            // Get communes with data
+            const xaCoDuLieu = [...new Set(soNhaData.map(item => item.MaXa))].filter(Boolean);
+
+            // Calculate statistics
+            const tongSoHuyen = filteredHuyen.length;
+            const tongSoXa = filteredXaPhuong.length;
+            const soXaCoDuLieu = filteredXaPhuong.filter(xa => xaCoDuLieu.includes(xa.MaXa)).length;
+            const soXaChuaCoDuLieu = tongSoXa - soXaCoDuLieu;
+
+            // Update statistics cards
+            document.getElementById('tongSoHuyen').textContent = tongSoHuyen.toLocaleString('vi-VN');
+            document.getElementById('tongSoXa').textContent = tongSoXa.toLocaleString('vi-VN');
+            document.getElementById('xaCoDuLieu').textContent = soXaCoDuLieu.toLocaleString('vi-VN');
+            document.getElementById('xaChuaCoDuLieu').textContent = soXaChuaCoDuLieu.toLocaleString('vi-VN');
+
+            document.getElementById('tyLeXaCoDuLieu').textContent =
+                tongSoXa > 0 ? `${((soXaCoDuLieu / tongSoXa) * 100).toFixed(1)}%` : '0%';
+            document.getElementById('tyLeXaChuaCoDuLieu').textContent =
+                tongSoXa > 0 ? `${((soXaChuaCoDuLieu / tongSoXa) * 100).toFixed(1)}%` : '0%';
+
+            // Update charts
+            updateOverviewCharts(filteredHuyen, filteredXaPhuong, xaCoDuLieu);
+
+            // Update tables
+            updateOverviewTables(filteredHuyen, filteredXaPhuong, xaCoDuLieu);
+        }
+
+        // Update overview charts
+        function updateOverviewCharts(filteredHuyen, filteredXaPhuong, xaCoDuLieu) {
+            // Completion rate by district
+            const huyenStats = {};
+            filteredHuyen.forEach(huyen => {
+                const xaInHuyen = filteredXaPhuong.filter(xa => xa.MaHuyen === huyen.MaHuyen);
+                const xaCoDuLieuInHuyen = xaInHuyen.filter(xa => xaCoDuLieu.includes(xa.MaXa));
+                const completionRate = xaInHuyen.length > 0 ? (xaCoDuLieuInHuyen.length / xaInHuyen.length) * 100 : 0;
+                huyenStats[huyen.QuanHuyen] = completionRate;
+            });
+
+            completionChart.data.labels = Object.keys(huyenStats);
+            completionChart.data.datasets[0].data = Object.values(huyenStats);
+            completionChart.update();
+
+            // Progress chart
+            const soXaCoDuLieu = filteredXaPhuong.filter(xa => xaCoDuLieu.includes(xa.MaXa)).length;
+            const soXaChuaCoDuLieu = filteredXaPhuong.length - soXaCoDuLieu;
+
+            progressChart.data.datasets[0].data = [soXaCoDuLieu, soXaChuaCoDuLieu];
+            progressChart.update();
+        }
+
+        // Update overview tables - FIXED VERSION TO SHOW ALL COMMUNES
+        function updateOverviewTables(filteredHuyen, filteredXaPhuong, xaCoDuLieu) {
+            // District overview table with complete missing data analysis
+            const overviewTableBody = document.getElementById('overviewTableBody');
+            overviewTableBody.innerHTML = '';
+
+            // Calculate data for each district and sort by completion rate descending
+            const huyenStatsArray = filteredHuyen.map(huyen => {
+                const xaInHuyen = filteredXaPhuong.filter(xa => xa.MaHuyen === huyen.MaHuyen);
+                const xaCoDuLieuInHuyen = xaInHuyen.filter(xa => xaCoDuLieu.includes(xa.MaXa));
+                const completionRate = xaInHuyen.length > 0 ? (xaCoDuLieuInHuyen.length / xaInHuyen.length) * 100 : 0;
+
+                // Count houses and all types of missing data in this district
+                const soNhaInHuyen = soNhaData.filter(item => item.MaHuyen === huyen.MaHuyen);
+                const soNhaTotal = soNhaInHuyen.length;
+
+                // Count different types of missing data
+                const soNhaThieuCCCD = soNhaInHuyen.filter(item => isBlank(item.CCCD)).length;
+                const soNhaThieuChuHo = soNhaInHuyen.filter(item => isBlank(item.ChuHo)).length;
+                const soNhaThieuCaHai = soNhaInHuyen.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
+
+                // Calculate percentages
+                const tyLeThieuCCCD = soNhaTotal > 0 ? (soNhaThieuCCCD / soNhaTotal) * 100 : 0;
+                const tyLeThieuChuHo = soNhaTotal > 0 ? (soNhaThieuChuHo / soNhaTotal) * 100 : 0;
+                const tyLeThieuCaHai = soNhaTotal > 0 ? (soNhaThieuCaHai / soNhaTotal) * 100 : 0;
+
+                return {
+                    huyen: huyen,
+                    xaInHuyen: xaInHuyen,
+                    xaCoDuLieuInHuyen: xaCoDuLieuInHuyen,
+                    completionRate: completionRate,
+                    soNhaTotal: soNhaTotal,
+                    soNhaThieuCCCD: soNhaThieuCCCD,
+                    soNhaThieuChuHo: soNhaThieuChuHo,
+                    soNhaThieuCaHai: soNhaThieuCaHai,
+                    tyLeThieuCCCD: tyLeThieuCCCD,
+                    tyLeThieuChuHo: tyLeThieuChuHo,
+                    tyLeThieuCaHai: tyLeThieuCaHai
+                };
+            }).sort((a, b) => b.completionRate - a.completionRate); // Sort by completion rate descending
+
+            huyenStatsArray.forEach(stats => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+
+                // Color coding functions
+                function getCompletionColor(rate) {
+                    if (rate === 100) return 'text-green-600 font-semibold';
+                    if (rate >= 50) return 'text-yellow-600';
+                    return 'text-red-600';
+                }
+
+                function getMissingDataColor(rate) {
+                    if (rate === 0) return 'text-green-600 font-semibold';
+                    if (rate <= 15) return 'text-green-600';
+                    if (rate <= 30) return 'text-yellow-600';
+                    return 'text-red-600';
+                }
+
+                row.innerHTML = `
+            <td class="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${stats.huyen.QuanHuyen}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">${stats.xaInHuyen.length}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">${stats.xaCoDuLieuInHuyen.length}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm ${getCompletionColor(stats.completionRate)} text-center font-medium">${stats.completionRate.toFixed(1)}%</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">${stats.soNhaTotal.toLocaleString('vi-VN')}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">${stats.soNhaThieuCCCD.toLocaleString('vi-VN')}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm ${getMissingDataColor(stats.tyLeThieuCCCD)} text-center font-medium">${stats.tyLeThieuCCCD.toFixed(1)}%</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">${stats.soNhaThieuChuHo.toLocaleString('vi-VN')}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm ${getMissingDataColor(stats.tyLeThieuChuHo)} text-center font-medium">${stats.tyLeThieuChuHo.toFixed(1)}%</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">${stats.soNhaThieuCaHai.toLocaleString('vi-VN')}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm ${getMissingDataColor(stats.tyLeThieuCaHai)} text-center font-medium">${stats.tyLeThieuCaHai.toFixed(1)}%</td>
+        `;
+                overviewTableBody.appendChild(row);
+            });
+
+            // FIXED: Commune status table - Show ALL communes (both with and without data)
+            const communeStatusTableBody = document.getElementById('communeStatusTableBody');
+            communeStatusTableBody.innerHTML = '';
+
+            // Sort communes: 1) By district name, 2) By commune name
+            const sortedXaPhuong = filteredXaPhuong.sort((a, b) => {
+                const huyenA = huyenData.find(h => h.MaHuyen === a.MaHuyen)?.QuanHuyen || '';
+                const huyenB = huyenData.find(h => h.MaHuyen === b.MaHuyen)?.QuanHuyen || '';
+
+                if (huyenA !== huyenB) {
+                    return huyenA.localeCompare(huyenB, 'vi-VN');
+                }
+                return a.TenXa.localeCompare(b.TenXa, 'vi-VN');
+            });
+
+            sortedXaPhuong.forEach((xa, index) => {
+                const huyenInfo = huyenData.find(h => h.MaHuyen === xa.MaHuyen);
+                const huyenName = huyenInfo ? huyenInfo.QuanHuyen : (xa.MaHuyen || 'Không xác định');
+                const hasCoDuLieu = xaCoDuLieu.includes(xa.MaXa);
+                const soNhaInXa = soNhaData.filter(item => item.MaXa === xa.MaXa).length;
+
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+
+                // Highlight row based on data status
+                if (!hasCoDuLieu) {
+                    row.className += ' bg-red-50';
+                }
+
+                row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${xa.TenXa}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${hasCoDuLieu ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }">
+                    ${hasCoDuLieu ? 'Có dữ liệu' : 'Chưa có dữ liệu'}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
+                ${hasCoDuLieu ? soNhaInXa.toLocaleString('vi-VN') : '0'}
+            </td>
+        `;
+                communeStatusTableBody.appendChild(row);
+            });
+        }
+
+        // Export overview report - FIXED VERSION TO INCLUDE ALL COMMUNES
+        function exportOverviewReport() {
+            try {
+                const huyenFilter = document.getElementById('huyenSelectOverview').value;
+
+                let filteredXaPhuong = xaPhuongData;
+                let filteredHuyen = huyenData;
+
+                if (huyenFilter) {
+                    filteredXaPhuong = xaPhuongData.filter(xa => xa.MaHuyen === huyenFilter);
+                    filteredHuyen = huyenData.filter(h => h.MaHuyen === huyenFilter);
+                }
+
+                const xaCoDuLieu = [...new Set(soNhaData.map(item => item.MaXa))].filter(Boolean);
+
+                const wb = XLSX.utils.book_new();
+
+                // Sheet 1: District overview with complete missing data analysis
+                const huyenOverviewData = filteredHuyen.map(huyen => {
+                    const xaInHuyen = filteredXaPhuong.filter(xa => xa.MaHuyen === huyen.MaHuyen);
+                    const xaCoDuLieuInHuyen = xaInHuyen.filter(xa => xaCoDuLieu.includes(xa.MaXa));
+                    const completionRate = xaInHuyen.length > 0 ? (xaCoDuLieuInHuyen.length / xaInHuyen.length) * 100 : 0;
+
+                    const soNhaInHuyen = soNhaData.filter(item => item.MaHuyen === huyen.MaHuyen);
+                    const soNhaTotal = soNhaInHuyen.length;
+
+                    // Count all types of missing data
+                    const soNhaThieuCCCD = soNhaInHuyen.filter(item => isBlank(item.CCCD)).length;
+                    const soNhaThieuChuHo = soNhaInHuyen.filter(item => isBlank(item.ChuHo)).length;
+                    const soNhaThieuCaHai = soNhaInHuyen.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
+
+                    const tyLeThieuCCCD = soNhaTotal > 0 ? (soNhaThieuCCCD / soNhaTotal) * 100 : 0;
+                    const tyLeThieuChuHo = soNhaTotal > 0 ? (soNhaThieuChuHo / soNhaTotal) * 100 : 0;
+                    const tyLeThieuCaHai = soNhaTotal > 0 ? (soNhaThieuCaHai / soNhaTotal) * 100 : 0;
+
+                    return {
+                        'Huyện': huyen.QuanHuyen,
+                        'Tổng xã': xaInHuyen.length,
+                        'Xã có dữ liệu': xaCoDuLieuInHuyen.length,
+                        'Tỷ lệ (%)': completionRate.toFixed(1),
+                        'Hộ đã ghi nhận': soNhaTotal,
+                        'Thiếu CCCD': soNhaThieuCCCD,
+                        'Tỷ lệ thiếu CCCD (%)': tyLeThieuCCCD.toFixed(1),
+                        'Thiếu Chủ hộ': soNhaThieuChuHo,
+                        'Tỷ lệ thiếu Chủ hộ (%)': tyLeThieuChuHo.toFixed(1),
+                        'Thiếu cả hai': soNhaThieuCaHai,
+                        'Tỷ lệ thiếu cả hai (%)': tyLeThieuCaHai.toFixed(1)
+                    };
+                }).sort((a, b) => parseFloat(b['Tỷ lệ (%)']) - parseFloat(a['Tỷ lệ (%)']));
+
+                const ws1 = XLSX.utils.json_to_sheet(huyenOverviewData);
+                XLSX.utils.book_append_sheet(wb, ws1, "I. TỔNG QUAN THEO HUYỆN");
+
+                // Sheet 2: ALL communes detailed status (FIXED TO SHOW ALL)
+                const xaDetailData = filteredXaPhuong
+                    .sort((a, b) => {
+                        const huyenA = huyenData.find(h => h.MaHuyen === a.MaHuyen)?.QuanHuyen || '';
+                        const huyenB = huyenData.find(h => h.MaHuyen === b.MaHuyen)?.QuanHuyen || '';
+
+                        if (huyenA !== huyenB) {
+                            return huyenA.localeCompare(huyenB, 'vi-VN');
+                        }
+                        return a.TenXa.localeCompare(b.TenXa, 'vi-VN');
+                    })
+                    .map((xa, index) => {
+                        const huyenInfo = huyenData.find(h => h.MaHuyen === xa.MaHuyen);
+                        const huyenName = huyenInfo ? huyenInfo.QuanHuyen : (xa.MaHuyen || 'Không xác định');
+                        const hasCoDuLieu = xaCoDuLieu.includes(xa.MaXa);
+                        const soNhaInXa = soNhaData.filter(item => item.MaXa === xa.MaXa).length;
+
+                        return {
+                            'STT': index + 1,
+                            'Xã/Phường': xa.TenXa,
+                            'Huyện': huyenName,
+                            'Trạng thái': hasCoDuLieu ? 'Có dữ liệu' : 'Chưa có dữ liệu',
+                            'Số nhà có dữ liệu': hasCoDuLieu ? soNhaInXa : 0
+                        };
+                    });
+
+                const ws2 = XLSX.utils.json_to_sheet(xaDetailData);
+                XLSX.utils.book_append_sheet(wb, ws2, "II. CHI TIẾT THEO XÃ");
+
+                // Sheet 3: Enhanced summary statistics
+                const tongSoHuyen = filteredHuyen.length;
+                const tongSoXa = filteredXaPhuong.length;
+                const soXaCoDuLieu = filteredXaPhuong.filter(xa => xaCoDuLieu.includes(xa.MaXa)).length;
+                const soXaChuaCoDuLieu = tongSoXa - soXaCoDuLieu;
+
+                const filteredSoNhaData = soNhaData.filter(item =>
+                    !huyenFilter || item.MaHuyen === huyenFilter
+                );
+                const tongSoNha = filteredSoNhaData.length;
+                const tongThieuCCCD = filteredSoNhaData.filter(item => isBlank(item.CCCD)).length;
+                const tongThieuChuHo = filteredSoNhaData.filter(item => isBlank(item.ChuHo)).length;
+                const tongThieuCaHai = filteredSoNhaData.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
+
+                const summaryData = [
+                    { 'Chỉ tiêu': 'Tổng số Huyện', 'Số lượng': tongSoHuyen, 'Tỷ lệ (%)': '100.0' },
+                    { 'Chỉ tiêu': 'Tổng số Xã', 'Số lượng': tongSoXa, 'Tỷ lệ (%)': '100.0' },
+                    { 'Chỉ tiêu': 'Xã có dữ liệu', 'Số lượng': soXaCoDuLieu, 'Tỷ lệ (%)': tongSoXa > 0 ? ((soXaCoDuLieu / tongSoXa) * 100).toFixed(1) : '0' },
+                    { 'Chỉ tiêu': 'Xã chưa có dữ liệu', 'Số lượng': soXaChuaCoDuLieu, 'Tỷ lệ (%)': tongSoXa > 0 ? ((soXaChuaCoDuLieu / tongSoXa) * 100).toFixed(1) : '0' },
+                    { 'Chỉ tiêu': 'Tổng hộ đã ghi nhận', 'Số lượng': tongSoNha, 'Tỷ lệ (%)': '100.0' },
+                    { 'Chỉ tiêu': 'Tổng hộ thiếu CCCD', 'Số lượng': tongThieuCCCD, 'Tỷ lệ (%)': tongSoNha > 0 ? ((tongThieuCCCD / tongSoNha) * 100).toFixed(1) : '0' },
+                    { 'Chỉ tiêu': 'Tổng hộ thiếu Chủ hộ', 'Số lượng': tongThieuChuHo, 'Tỷ lệ (%)': tongSoNha > 0 ? ((tongThieuChuHo / tongSoNha) * 100).toFixed(1) : '0' },
+                    { 'Chỉ tiêu': 'Tổng hộ thiếu cả hai', 'Số lượng': tongThieuCaHai, 'Tỷ lệ (%)': tongSoNha > 0 ? ((tongThieuCaHai / tongSoNha) * 100).toFixed(1) : '0' }
+                ];
+
+                const ws3 = XLSX.utils.json_to_sheet(summaryData);
+                XLSX.utils.book_append_sheet(wb, ws3, "III. THỐNG KÊ TỔNG QUAN");
+
+                // Export file
+                const locationSuffix = huyenFilter ?
+                    huyenData.find(h => h.MaHuyen === huyenFilter)?.QuanHuyen || huyenFilter :
+                    'BacGiang';
+                const fileName = createFileName(`TongQuan_ThuThapDuLieu_${locationSuffix}`);
+                XLSX.writeFile(wb, fileName);
+
+                showNotification('Xuất báo cáo tổng quan thành công!', 'success');
+
+            } catch (error) {
+                console.error('Lỗi xuất Excel:', error);
+                showNotification('Có lỗi xảy ra khi xuất file Excel!', 'error');
+            }
+        }
+
+        // Populate filter dropdowns (existing function)
+        function populateFilters() {
+            const huyenSelect = document.getElementById('huyenSelect');
+            huyenSelect.innerHTML = '<option value="">Tất cả Huyện</option>';
+
+            const huyenList = [...new Set(soNhaData.map(item => item.MaHuyen))].filter(Boolean);
+            huyenList.forEach(maHuyen => {
+                const huyenInfo = huyenData.find(h => h.MaHuyen === maHuyen);
+                const option = document.createElement('option');
+                option.value = maHuyen;
+                option.textContent = huyenInfo ? huyenInfo.QuanHuyen : maHuyen;
+                huyenSelect.appendChild(option);
+            });
+
+            populateXaFilter();
+        }
+
+        function populateXaFilter(selectedHuyen = null) {
+            const xaSelect = document.getElementById('xaSelect');
+            xaSelect.innerHTML = '<option value="">Tất cả Xã</option>';
+
+            let xaList = [...new Set(soNhaData.map(item => item.MaXa))].filter(Boolean);
+
+            if (selectedHuyen) {
+                xaList = [...new Set(soNhaData
+                    .filter(item => item.MaHuyen === selectedHuyen)
+                    .map(item => item.MaXa)
+                )].filter(Boolean);
+            }
+
+            xaList.forEach(maXa => {
+                const xaInfo = xaPhuongData.find(x => x.MaXa === maXa);
+                const option = document.createElement('option');
+                option.value = maXa;
+                option.textContent = xaInfo ? xaInfo.TenXa : maXa;
+                xaSelect.appendChild(option);
+            });
+        }
+
+        // Initialize charts (existing function)
+        function initCharts() {
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            pieChart = new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Thiếu CCCD', 'Thiếu Chủ hộ', 'Thiếu cả hai', 'Đầy đủ'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [
+                            '#EF4444',
+                            '#F59E0B',
+                            '#8B5CF6',
+                            '#10B981'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Số nhà',
+                        data: [],
+                        backgroundColor: '#3B82F6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update data and charts (existing function)
+        function updateData() {
+            const huyenFilter = document.getElementById('huyenSelect').value;
+            const xaFilter = document.getElementById('xaSelect').value;
+
+            let filteredData = soNhaData;
+            if (huyenFilter) {
+                filteredData = filteredData.filter(item => item.MaHuyen === huyenFilter);
+            }
+            if (xaFilter) {
+                filteredData = filteredData.filter(item => item.MaXa === xaFilter);
+            }
+
+            updateStatistics(filteredData);
+            updateCharts(filteredData);
+            updateTables(filteredData);
+            updateDetailLists(filteredData);
+        }
+
+        // Update statistics cards (existing function)
+        function updateStatistics(data) {
+            const total = data.length;
+            const thieuCCCD = data.filter(item => isBlank(item.CCCD)).length;
+            const thieuChuHo = data.filter(item => isBlank(item.ChuHo)).length;
+            const thieuCaHai = data.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
+
+            document.getElementById('tongSoNha').textContent = total.toLocaleString('vi-VN');
+            document.getElementById('thieuCCCD').textContent = thieuCCCD.toLocaleString('vi-VN');
+            document.getElementById('thieuChuHo').textContent = thieuChuHo.toLocaleString('vi-VN');
+            document.getElementById('thieuCaHai').textContent = thieuCaHai.toLocaleString('vi-VN');
+
+            document.getElementById('tyLeThieuCCCD').textContent =
+                total > 0 ? `${((thieuCCCD / total) * 100).toFixed(1)}%` : '0%';
+            document.getElementById('tyLeThieuChuHo').textContent =
+                total > 0 ? `${((thieuChuHo / total) * 100).toFixed(1)}%` : '0%';
+            document.getElementById('tyLeThieuCaHai').textContent =
+                total > 0 ? `${((thieuCaHai / total) * 100).toFixed(1)}%` : '0%';
+        }
+
+        // Update charts (existing function)
+        function updateCharts(data) {
+            const total = data.length;
+            const thieuCCCD = data.filter(item => isBlank(item.CCCD)).length;
+            const thieuChuHo = data.filter(item => isBlank(item.ChuHo)).length;
+            const thieuCaHai = data.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
+            const dayDu = total - thieuCCCD - thieuChuHo + thieuCaHai;
+
+            pieChart.data.datasets[0].data = [thieuCCCD, thieuChuHo, thieuCaHai, dayDu];
+            pieChart.update();
+
+            const huyenStats = {};
+            data.forEach(item => {
+                const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                const huyenName = huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định');
+                huyenStats[huyenName] = (huyenStats[huyenName] || 0) + 1;
+            });
+
+            barChart.data.labels = Object.keys(huyenStats);
+            barChart.data.datasets[0].data = Object.values(huyenStats);
+            barChart.update();
+        }
+
+        // Update tables với tỷ lệ phần trăm (existing function)
+        function updateTables(data) {
+            // Update Huyện table
+            const huyenStats = {};
+            data.forEach(item => {
+                const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                const huyenName = huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định');
+
+                if (!huyenStats[huyenName]) {
+                    huyenStats[huyenName] = { total: 0, thieuCCCD: 0, thieuChuHo: 0, thieuCaHai: 0 };
+                }
+
+                huyenStats[huyenName].total++;
+                if (isBlank(item.CCCD)) huyenStats[huyenName].thieuCCCD++;
+                if (isBlank(item.ChuHo)) huyenStats[huyenName].thieuChuHo++;
+                if (isBlank(item.CCCD) && isBlank(item.ChuHo)) huyenStats[huyenName].thieuCaHai++;
+            });
+
+            const huyenTableBody = document.getElementById('huyenTableBody');
+            huyenTableBody.innerHTML = '';
+
+            Object.entries(huyenStats).forEach(([huyenName, stats]) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${huyenName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${stats.total}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">${stats.thieuCCCD} (${stats.total > 0 ? ((stats.thieuCCCD / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-600">${stats.thieuChuHo} (${stats.total > 0 ? ((stats.thieuChuHo / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-purple-600">${stats.thieuCaHai} (${stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+            `;
+                huyenTableBody.appendChild(row);
+            });
+
+            // Update Xã table
+            const xaStats = {};
+            data.forEach(item => {
+                const xaInfo = xaPhuongData.find(x => x.MaXa === item.MaXa);
+                const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                const xaName = xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định');
+                const huyenName = huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định');
+
+                const key = `${xaName}_${huyenName}`;
+                if (!xaStats[key]) {
+                    xaStats[key] = { xaName, huyenName, total: 0, thieuCCCD: 0, thieuChuHo: 0, thieuCaHai: 0 };
+                }
+
+                xaStats[key].total++;
+                if (isBlank(item.CCCD)) xaStats[key].thieuCCCD++;
+                if (isBlank(item.ChuHo)) xaStats[key].thieuChuHo++;
+                if (isBlank(item.CCCD) && isBlank(item.ChuHo)) xaStats[key].thieuCaHai++;
+            });
+
+            const xaTableBody = document.getElementById('xaTableBody');
+            xaTableBody.innerHTML = '';
+
+            Object.values(xaStats).forEach(stats => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${stats.xaName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${stats.huyenName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${stats.total}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">${stats.thieuCCCD} (${stats.total > 0 ? ((stats.thieuCCCD / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-600">${stats.thieuChuHo} (${stats.total > 0 ? ((stats.thieuChuHo / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-purple-600">${stats.thieuCaHai} (${stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+            `;
+                xaTableBody.appendChild(row);
+            });
+        }
+
+        // Update detailed lists (existing function)
+        function updateDetailLists(data) {
+            const danhSachThieuCCCD = data.filter(item => isBlank(item.CCCD))
+                .sort((a, b) => {
+                    const soNhaA = (a.SoNha || '').toString().toLowerCase();
+                    const soNhaB = (b.SoNha || '').toString().toLowerCase();
+                    return soNhaA.localeCompare(soNhaB, 'vi-VN', { numeric: true });
+                });
+
+            const danhSachThieuChuHo = data.filter(item => isBlank(item.ChuHo))
+                .sort((a, b) => {
+                    const soNhaA = (a.SoNha || '').toString().toLowerCase();
+                    const soNhaB = (b.SoNha || '').toString().toLowerCase();
+                    return soNhaA.localeCompare(soNhaB, 'vi-VN', { numeric: true });
+                });
+
+            const danhSachThieuCaHai = data.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo))
+                .sort((a, b) => {
+                    const soNhaA = (a.SoNha || '').toString().toLowerCase();
+                    const soNhaB = (b.SoNha || '').toString().toLowerCase();
+                    return soNhaA.localeCompare(soNhaB, 'vi-VN', { numeric: true });
+                });
+
+            // Update counts
+            document.getElementById('countThieuCCCD').textContent = `${danhSachThieuCCCD.length} nhà`;
+            document.getElementById('countThieuChuHo').textContent = `${danhSachThieuChuHo.length} nhà`;
+            document.getElementById('countThieuCaHai').textContent = `${danhSachThieuCaHai.length} nhà`;
+
+            // Update tables
+            updateDetailTable('danhSachThieuCCCD', danhSachThieuCCCD, 'thieuCCCD');
+            updateDetailTable('danhSachThieuChuHo', danhSachThieuChuHo, 'thieuChuHo');
+            updateDetailTable('danhSachThieuCaHai', danhSachThieuCaHai, 'thieuCaHai');
+        }
+
+        function updateDetailTable(tableId, data, type) {
+            const tableBody = document.getElementById(tableId);
+            tableBody.innerHTML = '';
+
+            if (data.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                    <div class="flex flex-col items-center">
+                        <svg class="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p>Không có dữ liệu</p>
+                    </div>
+                </td>
+            `;
+                tableBody.appendChild(row);
+                return;
+            }
+
+            data.forEach((item, index) => {
+                const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                const xaInfo = xaPhuongData.find(x => x.MaXa === item.MaXa);
+                const huyenName = huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định');
+                const xaName = xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định');
+
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+
+                if (type === 'thieuCCCD') {
+                    row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.SoNha || ''}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.ChuHo || 'Trống'}</td>
+                    <td class="px-6 py-4 text-sm text-red-600">Thiếu CCCD</td>
+                `;
+                } else if (type === 'thieuChuHo') {
+                    row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.SoNha || ''}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.CCCD || 'Trống'}</td>
+                    <td class="px-6 py-4 text-sm text-yellow-600">Thiếu Chủ hộ</td>
+                `;
+                } else if (type === 'thieuCaHai') {
+                    row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.SoNha || ''}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">CCCD & Chủ hộ</td>
+                    <td class="px-6 py-4 text-sm text-purple-600">Thiếu cả hai</td>
+                `;
+                }
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        // FUNCTIONS XUẤT EXCEL - EXISTING FUNCTIONS
+
+        // Hàm tạo tên file với thời gian và bộ lọc (existing function)
+        function createFileName(prefix) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('vi-VN').replace(/\//g, '-');
+            const timeStr = now.toLocaleTimeString('vi-VN', { hour12: false }).replace(/:/g, '-');
+
+            // Loại bỏ ký tự đặc biệt trong tên file
+            const cleanPrefix = prefix.replace(/[\/\\:*?"<>|]/g, '_');
+
+            return `${cleanPrefix}_${dateStr}_${timeStr}.xlsx`;
+        }
+
+        // Hàm xuất báo cáo tổng hợp (existing function)
+        function exportSummaryReport() {
+            try {
+                const huyenFilter = document.getElementById('huyenSelect').value;
+                const xaFilter = document.getElementById('xaSelect').value;
+
+                let filteredData = soNhaData;
+                if (huyenFilter) {
+                    filteredData = filteredData.filter(item => item.MaHuyen === huyenFilter);
+                }
+                if (xaFilter) {
+                    filteredData = filteredData.filter(item => item.MaXa === xaFilter);
+                }
+
+                const wb = XLSX.utils.book_new();
+
+                // Sheet 1: Tổng hợp theo Huyện
+                const huyenStats = {};
+                filteredData.forEach(item => {
+                    const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                    const huyenName = huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định');
+
+                    if (!huyenStats[huyenName]) {
+                        huyenStats[huyenName] = { total: 0, thieuCCCD: 0, thieuChuHo: 0, thieuCaHai: 0 };
+                    }
+
+                    huyenStats[huyenName].total++;
+                    if (isBlank(item.CCCD)) huyenStats[huyenName].thieuCCCD++;
+                    if (isBlank(item.ChuHo)) huyenStats[huyenName].thieuChuHo++;
+                    if (isBlank(item.CCCD) && isBlank(item.ChuHo)) huyenStats[huyenName].thieuCaHai++;
+                });
+
+                const huyenData_export = Object.entries(huyenStats).map(([huyenName, stats]) => ({
+                    'Huyện': huyenName,
+                    'Tổng số nhà': stats.total,
+                    'Thiếu CCCD': stats.thieuCCCD,
+                    'Tỷ lệ thiếu CCCD (%)': stats.total > 0 ? ((stats.thieuCCCD / stats.total) * 100).toFixed(1) : '0',
+                    'Thiếu Chủ hộ': stats.thieuChuHo,
+                    'Tỷ lệ thiếu Chủ hộ (%)': stats.total > 0 ? ((stats.thieuChuHo / stats.total) * 100).toFixed(1) : '0',
+                    'Thiếu cả hai': stats.thieuCaHai,
+                    'Tỷ lệ thiếu cả hai (%)': stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0'
+                }));
+
+                const ws1 = XLSX.utils.json_to_sheet(huyenData_export);
+                XLSX.utils.book_append_sheet(wb, ws1, "Tổng hợp theo Huyện");
+
+                // Sheet 2: Tổng hợp theo Xã
+                const xaStats = {};
+                filteredData.forEach(item => {
+                    const xaInfo = xaPhuongData.find(x => x.MaXa === item.MaXa);
+                    const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                    const xaName = xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định');
+                    const huyenName = huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định');
+
+                    const key = `${xaName}_${huyenName}`;
+                    if (!xaStats[key]) {
+                        xaStats[key] = { xaName, huyenName, total: 0, thieuCCCD: 0, thieuChuHo: 0, thieuCaHai: 0 };
+                    }
+
+                    xaStats[key].total++;
+                    if (isBlank(item.CCCD)) xaStats[key].thieuCCCD++;
+                    if (isBlank(item.ChuHo)) xaStats[key].thieuChuHo++;
+                    if (isBlank(item.CCCD) && isBlank(item.ChuHo)) xaStats[key].thieuCaHai++;
+                });
+
+                const xaData_export = Object.values(xaStats).map(stats => ({
+                    'Xã/Phường': stats.xaName,
+                    'Huyện': stats.huyenName,
+                    'Tổng số nhà': stats.total,
+                    'Thiếu CCCD': stats.thieuCCCD,
+                    'Tỷ lệ thiếu CCCD (%)': stats.total > 0 ? ((stats.thieuCCCD / stats.total) * 100).toFixed(1) : '0',
+                    'Thiếu Chủ hộ': stats.thieuChuHo,
+                    'Tỷ lệ thiếu Chủ hộ (%)': stats.total > 0 ? ((stats.thieuChuHo / stats.total) * 100).toFixed(1) : '0',
+                    'Thiếu cả hai': stats.thieuCaHai,
+                    'Tỷ lệ thiếu cả hai (%)': stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0'
+                }));
+
+                const ws2 = XLSX.utils.json_to_sheet(xaData_export);
+                XLSX.utils.book_append_sheet(wb, ws2, "Tổng hợp theo Xã");
+
+                // Sheet 3: Thống kê tổng quan
+                const total = filteredData.length;
+                const thieuCCCD = filteredData.filter(item => isBlank(item.CCCD)).length;
+                const thieuChuHo = filteredData.filter(item => isBlank(item.ChuHo)).length;
+                const thieuCaHai = filteredData.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
+                const dayDu = total - thieuCCCD - thieuChuHo + thieuCaHai;
+
+                const tongQuanData = [
+                    { 'Chỉ tiêu': 'Tổng số nhà', 'Số lượng': total, 'Tỷ lệ (%)': '100.0' },
+                    { 'Chỉ tiêu': 'Nhà thiếu CCCD', 'Số lượng': thieuCCCD, 'Tỷ lệ (%)': total > 0 ? ((thieuCCCD / total) * 100).toFixed(1) : '0' },
+                    { 'Chỉ tiêu': 'Nhà thiếu Chủ hộ', 'Số lượng': thieuChuHo, 'Tỷ lệ (%)': total > 0 ? ((thieuChuHo / total) * 100).toFixed(1) : '0' },
+                    { 'Chỉ tiêu': 'Nhà thiếu cả hai', 'Số lượng': thieuCaHai, 'Tỷ lệ (%)': total > 0 ? ((thieuCaHai / total) * 100).toFixed(1) : '0' },
+                    { 'Chỉ tiêu': 'Nhà đầy đủ thông tin', 'Số lượng': dayDu, 'Tỷ lệ (%)': total > 0 ? ((dayDu / total) * 100).toFixed(1) : '0' }
+                ];
+
+                const ws3 = XLSX.utils.json_to_sheet(tongQuanData);
+                XLSX.utils.book_append_sheet(wb, ws3, "Thống kê tổng quan");
+
+                // Xuất file
+                const fileName = createFileName('BaoCao_TongHop_SoNha_BacGiang');
+                XLSX.writeFile(wb, fileName);
+
+                // Hiển thị thông báo thành công
+                showNotification('Xuất báo cáo tổng hợp thành công!', 'success');
+
+            } catch (error) {
+                console.error('Lỗi xuất Excel:', error);
+                showNotification('Có lỗi xảy ra khi xuất file Excel!', 'error');
+            }
+        }
+
+        // Hàm xuất danh sách chi tiết thiếu thông tin (existing function)
+        function exportDetailReport() {
+            try {
+                const huyenFilter = document.getElementById('huyenSelect').value;
+                const xaFilter = document.getElementById('xaSelect').value;
+
+                let filteredData = soNhaData;
+                if (huyenFilter) {
+                    filteredData = filteredData.filter(item => item.MaHuyen === huyenFilter);
+                }
+                if (xaFilter) {
+                    filteredData = filteredData.filter(item => item.MaXa === xaFilter);
+                }
+
+                const wb = XLSX.utils.book_new();
+
+                // Sheet 1: Danh sách thiếu CCCD
+                const danhSachThieuCCCD = filteredData.filter(item => isBlank(item.CCCD))
+                    .sort((a, b) => {
+                        const soNhaA = (a.SoNha || '').toString().toLowerCase();
+                        const soNhaB = (b.SoNha || '').toString().toLowerCase();
+                        return soNhaA.localeCompare(soNhaB, 'vi-VN', { numeric: true });
+                    })
+                    .map((item, index) => {
+                        const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                        const xaInfo = xaPhuongData.find(x => x.MaXa === item.MaXa);
+                        return {
+                            'STT': index + 1,
+                            'Số nhà': item.SoNha || '',
+                            'Địa chỉ': item.MaTuyen || '',
+                            'Xã/Phường': xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định'),
+                            'Huyện': huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định'),
+                            'Chủ hộ': item.ChuHo || 'Trống',
+                            'Ghi chú': 'Thiếu CCCD'
+                        };
+                    });
+
+                if (danhSachThieuCCCD.length > 0) {
+                    const ws1 = XLSX.utils.json_to_sheet(danhSachThieuCCCD);
+                    XLSX.utils.book_append_sheet(wb, ws1, "Danh sách thiếu CCCD");
+                }
+
+                // Sheet 2: Danh sách thiếu Chủ hộ
+                const danhSachThieuChuHo = filteredData.filter(item => isBlank(item.ChuHo))
+                    .sort((a, b) => {
+                        const soNhaA = (a.SoNha || '').toString().toLowerCase();
+                        const soNhaB = (b.SoNha || '').toString().toLowerCase();
+                        return soNhaA.localeCompare(soNhaB, 'vi-VN', { numeric: true });
+                    })
+                    .map((item, index) => {
+                        const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                        const xaInfo = xaPhuongData.find(x => x.MaXa === item.MaXa);
+                        return {
+                            'STT': index + 1,
+                            'Số nhà': item.SoNha || '',
+                            'Địa chỉ': item.MaTuyen || '',
+                            'Xã/Phường': xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định'),
+                            'Huyện': huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định'),
+                            'CCCD': item.CCCD || 'Trống',
+                            'Ghi chú': 'Thiếu Chủ hộ'
+                        };
+                    });
+
+                if (danhSachThieuChuHo.length > 0) {
+                    const ws2 = XLSX.utils.json_to_sheet(danhSachThieuChuHo);
+                    XLSX.utils.book_append_sheet(wb, ws2, "Danh sách thiếu Chủ hộ");
+                }
+
+                // Sheet 3: Danh sách thiếu cả hai
+                const danhSachThieuCaHai = filteredData.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo))
+                    .sort((a, b) => {
+                        const soNhaA = (a.SoNha || '').toString().toLowerCase();
+                        const soNhaB = (b.SoNha || '').toString().toLowerCase();
+                        return soNhaA.localeCompare(soNhaB, 'vi-VN', { numeric: true });
+                    })
+                    .map((item, index) => {
+                        const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                        const xaInfo = xaPhuongData.find(x => x.MaXa === item.MaXa);
+                        return {
+                            'STT': index + 1,
+                            'Số nhà': item.SoNha || '',
+                            'Địa chỉ': item.MaTuyen || '',
+                            'Xã/Phường': xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định'),
+                            'Huyện': huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định'),
+                            'Trường thiếu': 'CCCD & Chủ hộ',
+                            'Ghi chú': 'Thiếu cả hai'
+                        };
+                    });
+
+                if (danhSachThieuCaHai.length > 0) {
+                    const ws3 = XLSX.utils.json_to_sheet(danhSachThieuCaHai);
+                    XLSX.utils.book_append_sheet(wb, ws3, "Danh sách thiếu cả hai");
+                }
+
+                // Kiểm tra xem có dữ liệu nào để xuất không
+                if (wb.SheetNames.length === 0) {
+                    showNotification('Không có dữ liệu thiếu thông tin để xuất!', 'warning');
+                    return;
+                }
+
+                // Thêm sheet tổng hợp số liệu
+                const summaryData = [
+                    { 'Loại thiếu': 'Thiếu CCCD', 'Số lượng': danhSachThieuCCCD.length },
+                    { 'Loại thiếu': 'Thiếu Chủ hộ', 'Số lượng': danhSachThieuChuHo.length },
+                    { 'Loại thiếu': 'Thiếu cả hai', 'Số lượng': danhSachThieuCaHai.length }
+                ];
+
+                const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+                XLSX.utils.book_append_sheet(wb, wsSummary, "Tổng hợp");
+
+                // Xuất file
+                const fileName = createFileName('BaoCao_ChiTiet_ThieuThongTin_BacGiang');
+                XLSX.writeFile(wb, fileName);
+
+                // Hiển thị thông báo thành công
+                showNotification('Xuất báo cáo chi tiết thành công!', 'success');
+
+            } catch (error) {
+                console.error('Lỗi xuất Excel:', error);
+                showNotification('Có lỗi xảy ra khi xuất file Excel!', 'error');
+            }
+        }
+
+        // Hàm hiển thị thông báo (existing function)
+        function showNotification(message, type = 'info') {
+            // Tạo element thông báo
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300 transform translate-x-full`;
+
+            // Thiết lập màu sắc theo loại thông báo
+            switch (type) {
+                case 'success':
+                    notification.className += ' bg-green-500 text-white';
+                    break;
+                case 'error':
+                    notification.className += ' bg-red-500 text-white';
+                    break;
+                case 'warning':
+                    notification.className += ' bg-yellow-500 text-white';
+                    break;
+                default:
+                    notification.className += ' bg-blue-500 text-white';
+            }
+
+            notification.innerHTML = `
+             <div class="flex items-center gap-2">
+                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                           d="${type === 'success' ? 'M5 13l4 4L19 7' :
+                    type === 'error' ? 'M6 18L18 6M6 6l12 12' :
+                        type === 'warning' ? 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.664-.833-2.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z' :
+                            'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}">
+                     </path>
+                 </svg>
+                 <span>${message}</span>
+             </div>
+         `;
+
+            // Thêm vào DOM
+            document.body.appendChild(notification);
+
+            // Animate vào
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            // Tự động ẩn sau 3 giây
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Initialize tabs
+            initTabs();
+
+            // Initialize charts
+            initCharts();
+            initOverviewCharts();
+
+            // Hiển thị loading
+            console.log("Đang tải dữ liệu...");
+
+            try {
+                await Promise.all([
+                    fetchHuyenData(),
+                    fetchXaPhuongData(),
+                    fetchSoNhaData()
+                ]);
+
+                // Populate filters for both tabs
+                populateFilters();
+                populateOverviewFilters();
+
+                // Update data for default active tab (Overview)
+                updateOverviewData();
+
+                console.log("✓ Hoàn thành tải dữ liệu");
+
+            } catch (error) {
+                console.error("Lỗi khởi tạo:", error);
+                showNotification('Có lỗi xảy ra khi tải dữ liệu!', 'error');
+            }
+        });
+
+        // Filter change handlers for existing functionality
+        document.getElementById('huyenSelect').addEventListener('change', function () {
+            const selectedHuyen = this.value;
+            populateXaFilter(selectedHuyen);
+            updateData();
+        });
+
+        document.getElementById('xaSelect').addEventListener('change', function () {
+            updateData();
+        });
+
+        // Filter change handlers for overview
+        document.getElementById('huyenSelectOverview').addEventListener('change', function () {
+            updateOverviewData();
+        });
+
+        // Event listeners cho các nút xuất Excel
+        document.getElementById('exportSummaryBtn').addEventListener('click', exportSummaryReport);
+        document.getElementById('exportDetailBtn').addEventListener('click', exportDetailReport);
+        document.getElementById('exportOverviewBtn').addEventListener('click', exportOverviewReport);
+
+        // Add CSS for tab functionality
+        const style = document.createElement('style');
+        style.textContent = `
+           .tab-content {
+               display: block;
+           }
+           .tab-content.hidden {
+               display: none;
+           }
+           .nav-tab {
+               transition: all 0.3s ease;
+               cursor: pointer;
+           }
+           .nav-tab:hover {
+               background-color: #f9fafb;
+           }
+       `;
+        document.head.appendChild(style);
+
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        }, false);
+
+        document.onkeydown = function (e) {
+            if (e.keyCode == 123) {
+                return false;
+            }
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+                return false;
+            }
+            if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+                return false;
+            }
+            if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+                return false;
+            }
+        };
+    </script>
+</body>
+
+</html>
