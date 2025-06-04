@@ -9,6 +9,27 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Thêm SheetJS để xuất Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        /* Thêm vào phần CSS hiện có */
+        #overviewTableBody td {
+            font-size: 0.875rem;
+            /* Giảm size font một chút */
+            padding: 8px 6px;
+            /* Giảm padding */
+        }
+
+        #overviewTableBody th {
+            font-size: 0.75rem;
+            /* Header nhỏ hơn */
+            padding: 8px 6px;
+        }
+
+        /* Đảm bảo bảng scroll ngang trên mobile */
+        .overflow-x-auto {
+            min-width: 100%;
+        }
+    </style>
 </head>
 
 <body class="bg-gray-50">
@@ -197,6 +218,13 @@
                                 <th
                                     class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Tỷ lệ thiếu cả hai (%)</th>
+                                <!-- THÊM 2 cột mới cho CCCD sai định dạng -->
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    CCCD sai định dạng</th>
+                                <th
+                                    class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tỷ lệ sai định dạng (%)</th>
                             </tr>
                         </thead>
                         <tbody id="overviewTableBody" class="bg-white divide-y divide-gray-200">
@@ -292,7 +320,7 @@
         <!-- Main Content -->
         <main class="container mx-auto px-6 py-8">
             <!-- Statistics Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <div class="flex items-center">
                         <div class="flex-1">
@@ -356,6 +384,24 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Thêm card này vào grid Statistics Cards -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="flex-1">
+                            <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wide">CCCD sai định dạng
+                            </h3>
+                            <p class="text-3xl font-bold text-orange-600" id="saiDinhDang">0</p>
+                            <p class="text-sm text-gray-500" id="tyLeSaiDinhDang">0%</p>
+                        </div>
+                        <div class="bg-orange-100 p-3 rounded-full">
+                            <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Charts Section -->
@@ -386,6 +432,7 @@
                     </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
+                            <!-- Cập nhật header bảng Huyện -->
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th
@@ -403,6 +450,10 @@
                                     <th
                                         class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Thiếu cả hai</th>
+                                    <!-- THÊM cột mới -->
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        CCCD sai định dạng</th>
                                 </tr>
                             </thead>
                             <tbody id="huyenTableBody" class="bg-white divide-y divide-gray-200">
@@ -424,9 +475,7 @@
                                     <th
                                         class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Xã</th>
-                                    <th
-                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Huyện</th>
+
                                     <th
                                         class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Tổng số</th>
@@ -439,6 +488,12 @@
                                     <th
                                         class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Thiếu cả hai</th>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        CCCD sai định dạng</th>
+                                    <th
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Huyện</th>
                                 </tr>
                             </thead>
                             <tbody id="xaTableBody" class="bg-white divide-y divide-gray-200">
@@ -569,6 +624,50 @@
                                 </tr>
                             </thead>
                             <tbody id="danhSachThieuCaHai" class="bg-white divide-y divide-gray-200">
+                                <!-- Data will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Thêm section này vào phần Detailed Lists Section -->
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-orange-600">Danh sách chi tiết CCCD sai định dạng</h3>
+                        <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-medium"
+                            id="countSaiDinhDang">0 nhà</span>
+                    </div>
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-orange-50 sticky top-0">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        STT</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Số nhà</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Địa chỉ</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Xã</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Huyện</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Chủ hộ</th>
+                                    <!-- <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        CCCD</th> -->
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody id="danhSachSaiDinhDang" class="bg-white divide-y divide-gray-200">
                                 <!-- Data will be loaded here -->
                             </tbody>
                         </table>
@@ -842,6 +941,7 @@
         }
 
         // Update overview tables - FIXED VERSION TO SHOW ALL COMMUNES
+        // Update overview tables - ENHANCED VERSION WITH CCCD SAI DINH DANG
         function updateOverviewTables(filteredHuyen, filteredXaPhuong, xaCoDuLieu) {
             // District overview table with complete missing data analysis
             const overviewTableBody = document.getElementById('overviewTableBody');
@@ -862,10 +962,16 @@
                 const soNhaThieuChuHo = soNhaInHuyen.filter(item => isBlank(item.ChuHo)).length;
                 const soNhaThieuCaHai = soNhaInHuyen.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
 
+                // THÊM: Count CCCD sai định dạng
+                const soNhaSaiDinhDang = soNhaInHuyen.filter(item => item.SaiDinhDang === 'Y' || item.SaiDinhDang === true).length;
+
                 // Calculate percentages
                 const tyLeThieuCCCD = soNhaTotal > 0 ? (soNhaThieuCCCD / soNhaTotal) * 100 : 0;
                 const tyLeThieuChuHo = soNhaTotal > 0 ? (soNhaThieuChuHo / soNhaTotal) * 100 : 0;
                 const tyLeThieuCaHai = soNhaTotal > 0 ? (soNhaThieuCaHai / soNhaTotal) * 100 : 0;
+
+                // THÊM: Calculate percentage for CCCD sai định dạng
+                const tyLeSaiDinhDang = soNhaTotal > 0 ? (soNhaSaiDinhDang / soNhaTotal) * 100 : 0;
 
                 return {
                     huyen: huyen,
@@ -876,9 +982,11 @@
                     soNhaThieuCCCD: soNhaThieuCCCD,
                     soNhaThieuChuHo: soNhaThieuChuHo,
                     soNhaThieuCaHai: soNhaThieuCaHai,
+                    soNhaSaiDinhDang: soNhaSaiDinhDang,  // THÊM
                     tyLeThieuCCCD: tyLeThieuCCCD,
                     tyLeThieuChuHo: tyLeThieuChuHo,
-                    tyLeThieuCaHai: tyLeThieuCaHai
+                    tyLeThieuCaHai: tyLeThieuCaHai,
+                    tyLeSaiDinhDang: tyLeSaiDinhDang     // THÊM
                 };
             }).sort((a, b) => b.completionRate - a.completionRate); // Sort by completion rate descending
 
@@ -912,6 +1020,8 @@
             <td class="px-3 py-4 whitespace-nowrap text-sm ${getMissingDataColor(stats.tyLeThieuChuHo)} text-center font-medium">${stats.tyLeThieuChuHo.toFixed(1)}%</td>
             <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">${stats.soNhaThieuCaHai.toLocaleString('vi-VN')}</td>
             <td class="px-3 py-4 whitespace-nowrap text-sm ${getMissingDataColor(stats.tyLeThieuCaHai)} text-center font-medium">${stats.tyLeThieuCaHai.toFixed(1)}%</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-center">${stats.soNhaSaiDinhDang.toLocaleString('vi-VN')}</td>
+            <td class="px-3 py-4 whitespace-nowrap text-sm ${getMissingDataColor(stats.tyLeSaiDinhDang)} text-center font-medium">${stats.tyLeSaiDinhDang.toFixed(1)}%</td>
         `;
                 overviewTableBody.appendChild(row);
             });
@@ -950,8 +1060,7 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${xa.TenXa}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${hasCoDuLieu ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${hasCoDuLieu ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
                     ${hasCoDuLieu ? 'Có dữ liệu' : 'Chưa có dữ liệu'}
                 </span>
             </td>
@@ -964,6 +1073,7 @@
         }
 
         // Export overview report - FIXED VERSION TO INCLUDE ALL COMMUNES
+        // Export overview report - ENHANCED VERSION WITH CCCD SAI DINH DANG
         function exportOverviewReport() {
             try {
                 const huyenFilter = document.getElementById('huyenSelectOverview').value;
@@ -980,7 +1090,7 @@
 
                 const wb = XLSX.utils.book_new();
 
-                // Sheet 1: District overview with complete missing data analysis
+                // Sheet 1: District overview with complete missing data analysis INCLUDING CCCD sai định dạng
                 const huyenOverviewData = filteredHuyen.map(huyen => {
                     const xaInHuyen = filteredXaPhuong.filter(xa => xa.MaHuyen === huyen.MaHuyen);
                     const xaCoDuLieuInHuyen = xaInHuyen.filter(xa => xaCoDuLieu.includes(xa.MaXa));
@@ -994,9 +1104,15 @@
                     const soNhaThieuChuHo = soNhaInHuyen.filter(item => isBlank(item.ChuHo)).length;
                     const soNhaThieuCaHai = soNhaInHuyen.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
 
+                    // THÊM: Count CCCD sai định dạng
+                    const soNhaSaiDinhDang = soNhaInHuyen.filter(item => item.SaiDinhDang === 'Y' || item.SaiDinhDang === true).length;
+
                     const tyLeThieuCCCD = soNhaTotal > 0 ? (soNhaThieuCCCD / soNhaTotal) * 100 : 0;
                     const tyLeThieuChuHo = soNhaTotal > 0 ? (soNhaThieuChuHo / soNhaTotal) * 100 : 0;
                     const tyLeThieuCaHai = soNhaTotal > 0 ? (soNhaThieuCaHai / soNhaTotal) * 100 : 0;
+
+                    // THÊM: Calculate percentage for CCCD sai định dạng
+                    const tyLeSaiDinhDang = soNhaTotal > 0 ? (soNhaSaiDinhDang / soNhaTotal) * 100 : 0;
 
                     return {
                         'Huyện': huyen.QuanHuyen,
@@ -1009,14 +1125,17 @@
                         'Thiếu Chủ hộ': soNhaThieuChuHo,
                         'Tỷ lệ thiếu Chủ hộ (%)': tyLeThieuChuHo.toFixed(1),
                         'Thiếu cả hai': soNhaThieuCaHai,
-                        'Tỷ lệ thiếu cả hai (%)': tyLeThieuCaHai.toFixed(1)
+                        'Tỷ lệ thiếu cả hai (%)': tyLeThieuCaHai.toFixed(1),
+                        // THÊM: CCCD sai định dạng columns
+                        'CCCD sai định dạng': soNhaSaiDinhDang,
+                        'Tỷ lệ sai định dạng (%)': tyLeSaiDinhDang.toFixed(1)
                     };
                 }).sort((a, b) => parseFloat(b['Tỷ lệ (%)']) - parseFloat(a['Tỷ lệ (%)']));
 
                 const ws1 = XLSX.utils.json_to_sheet(huyenOverviewData);
                 XLSX.utils.book_append_sheet(wb, ws1, "I. TỔNG QUAN THEO HUYỆN");
 
-                // Sheet 2: ALL communes detailed status (FIXED TO SHOW ALL)
+                // Sheet 2: ALL communes detailed status (giữ nguyên)
                 const xaDetailData = filteredXaPhuong
                     .sort((a, b) => {
                         const huyenA = huyenData.find(h => h.MaHuyen === a.MaHuyen)?.QuanHuyen || '';
@@ -1045,7 +1164,7 @@
                 const ws2 = XLSX.utils.json_to_sheet(xaDetailData);
                 XLSX.utils.book_append_sheet(wb, ws2, "II. CHI TIẾT THEO XÃ");
 
-                // Sheet 3: Enhanced summary statistics
+                // Sheet 3: Enhanced summary statistics INCLUDING CCCD sai định dạng
                 const tongSoHuyen = filteredHuyen.length;
                 const tongSoXa = filteredXaPhuong.length;
                 const soXaCoDuLieu = filteredXaPhuong.filter(xa => xaCoDuLieu.includes(xa.MaXa)).length;
@@ -1059,6 +1178,9 @@
                 const tongThieuChuHo = filteredSoNhaData.filter(item => isBlank(item.ChuHo)).length;
                 const tongThieuCaHai = filteredSoNhaData.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
 
+                // THÊM: Tổng CCCD sai định dạng
+                const tongSaiDinhDang = filteredSoNhaData.filter(item => item.SaiDinhDang === 'Y' || item.SaiDinhDang === true).length;
+
                 const summaryData = [
                     { 'Chỉ tiêu': 'Tổng số Huyện', 'Số lượng': tongSoHuyen, 'Tỷ lệ (%)': '100.0' },
                     { 'Chỉ tiêu': 'Tổng số Xã', 'Số lượng': tongSoXa, 'Tỷ lệ (%)': '100.0' },
@@ -1067,7 +1189,9 @@
                     { 'Chỉ tiêu': 'Tổng hộ đã ghi nhận', 'Số lượng': tongSoNha, 'Tỷ lệ (%)': '100.0' },
                     { 'Chỉ tiêu': 'Tổng hộ thiếu CCCD', 'Số lượng': tongThieuCCCD, 'Tỷ lệ (%)': tongSoNha > 0 ? ((tongThieuCCCD / tongSoNha) * 100).toFixed(1) : '0' },
                     { 'Chỉ tiêu': 'Tổng hộ thiếu Chủ hộ', 'Số lượng': tongThieuChuHo, 'Tỷ lệ (%)': tongSoNha > 0 ? ((tongThieuChuHo / tongSoNha) * 100).toFixed(1) : '0' },
-                    { 'Chỉ tiêu': 'Tổng hộ thiếu cả hai', 'Số lượng': tongThieuCaHai, 'Tỷ lệ (%)': tongSoNha > 0 ? ((tongThieuCaHai / tongSoNha) * 100).toFixed(1) : '0' }
+                    { 'Chỉ tiêu': 'Tổng hộ thiếu cả hai', 'Số lượng': tongThieuCaHai, 'Tỷ lệ (%)': tongSoNha > 0 ? ((tongThieuCaHai / tongSoNha) * 100).toFixed(1) : '0' },
+                    // THÊM: CCCD sai định dạng
+                    { 'Chỉ tiêu': 'Tổng hộ CCCD sai định dạng', 'Số lượng': tongSaiDinhDang, 'Tỷ lệ (%)': tongSoNha > 0 ? ((tongSaiDinhDang / tongSoNha) * 100).toFixed(1) : '0' }
                 ];
 
                 const ws3 = XLSX.utils.json_to_sheet(summaryData);
@@ -1204,10 +1328,16 @@
             const thieuChuHo = data.filter(item => isBlank(item.ChuHo)).length;
             const thieuCaHai = data.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
 
+            // THÊM: Thống kê CCCD sai định dạng
+            const saiDinhDang = data.filter(item => item.SaiDinhDang === 'Y' || item.SaiDinhDang === true).length;
+
             document.getElementById('tongSoNha').textContent = total.toLocaleString('vi-VN');
             document.getElementById('thieuCCCD').textContent = thieuCCCD.toLocaleString('vi-VN');
             document.getElementById('thieuChuHo').textContent = thieuChuHo.toLocaleString('vi-VN');
             document.getElementById('thieuCaHai').textContent = thieuCaHai.toLocaleString('vi-VN');
+
+            // THÊM: Cập nhật thống kê CCCD sai định dạng
+            document.getElementById('saiDinhDang').textContent = saiDinhDang.toLocaleString('vi-VN');
 
             document.getElementById('tyLeThieuCCCD').textContent =
                 total > 0 ? `${((thieuCCCD / total) * 100).toFixed(1)}%` : '0%';
@@ -1215,6 +1345,10 @@
                 total > 0 ? `${((thieuChuHo / total) * 100).toFixed(1)}%` : '0%';
             document.getElementById('tyLeThieuCaHai').textContent =
                 total > 0 ? `${((thieuCaHai / total) * 100).toFixed(1)}%` : '0%';
+
+            // THÊM: Cập nhật tỷ lệ CCCD sai định dạng
+            document.getElementById('tyLeSaiDinhDang').textContent =
+                total > 0 ? `${((saiDinhDang / total) * 100).toFixed(1)}%` : '0%';
         }
 
         // Update charts (existing function)
@@ -1223,11 +1357,25 @@
             const thieuCCCD = data.filter(item => isBlank(item.CCCD)).length;
             const thieuChuHo = data.filter(item => isBlank(item.ChuHo)).length;
             const thieuCaHai = data.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
-            const dayDu = total - thieuCCCD - thieuChuHo + thieuCaHai;
 
-            pieChart.data.datasets[0].data = [thieuCCCD, thieuChuHo, thieuCaHai, dayDu];
+            // THÊM: CCCD sai định dạng
+            const saiDinhDang = data.filter(item => item.SaiDinhDang === 'Y' || item.SaiDinhDang === true).length;
+
+            const dayDu = total - thieuCCCD - thieuChuHo - saiDinhDang + thieuCaHai;
+
+            // Cập nhật labels và data cho pie chart
+            pieChart.data.labels = ['Thiếu CCCD', 'Thiếu Chủ hộ', 'Thiếu cả hai', 'CCCD sai định dạng', 'Đầy đủ'];
+            pieChart.data.datasets[0].data = [thieuCCCD, thieuChuHo, thieuCaHai, saiDinhDang, dayDu];
+            pieChart.data.datasets[0].backgroundColor = [
+                '#EF4444',  // Thiếu CCCD - Đỏ
+                '#F59E0B',  // Thiếu Chủ hộ - Vàng
+                '#8B5CF6',  // Thiếu cả hai - Tím
+                '#F97316',  // CCCD sai định dạng - Cam
+                '#10B981'   // Đầy đủ - Xanh lá
+            ];
             pieChart.update();
 
+            // Phần bar chart giữ nguyên
             const huyenStats = {};
             data.forEach(item => {
                 const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
@@ -1249,13 +1397,24 @@
                 const huyenName = huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định');
 
                 if (!huyenStats[huyenName]) {
-                    huyenStats[huyenName] = { total: 0, thieuCCCD: 0, thieuChuHo: 0, thieuCaHai: 0 };
+                    huyenStats[huyenName] = {
+                        total: 0,
+                        thieuCCCD: 0,
+                        thieuChuHo: 0,
+                        thieuCaHai: 0,
+                        saiDinhDang: 0  // THÊM: CCCD sai định dạng
+                    };
                 }
 
                 huyenStats[huyenName].total++;
                 if (isBlank(item.CCCD)) huyenStats[huyenName].thieuCCCD++;
                 if (isBlank(item.ChuHo)) huyenStats[huyenName].thieuChuHo++;
                 if (isBlank(item.CCCD) && isBlank(item.ChuHo)) huyenStats[huyenName].thieuCaHai++;
+
+                // THÊM: Kiểm tra CCCD sai định dạng
+                if (item.SaiDinhDang === 'Y' || item.SaiDinhDang === true) {
+                    huyenStats[huyenName].saiDinhDang++;
+                }
             });
 
             const huyenTableBody = document.getElementById('huyenTableBody');
@@ -1264,12 +1423,13 @@
             Object.entries(huyenStats).forEach(([huyenName, stats]) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${huyenName}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${stats.total}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">${stats.thieuCCCD} (${stats.total > 0 ? ((stats.thieuCCCD / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-600">${stats.thieuChuHo} (${stats.total > 0 ? ((stats.thieuChuHo / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-purple-600">${stats.thieuCaHai} (${stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
-            `;
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${huyenName}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${stats.total}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">${stats.thieuCCCD} (${stats.total > 0 ? ((stats.thieuCCCD / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-600">${stats.thieuChuHo} (${stats.total > 0 ? ((stats.thieuChuHo / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-purple-600">${stats.thieuCaHai} (${stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-orange-600">${stats.saiDinhDang} (${stats.total > 0 ? ((stats.saiDinhDang / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+        `;
                 huyenTableBody.appendChild(row);
             });
 
@@ -1283,13 +1443,26 @@
 
                 const key = `${xaName}_${huyenName}`;
                 if (!xaStats[key]) {
-                    xaStats[key] = { xaName, huyenName, total: 0, thieuCCCD: 0, thieuChuHo: 0, thieuCaHai: 0 };
+                    xaStats[key] = {
+                        xaName,
+                        huyenName,
+                        total: 0,
+                        thieuCCCD: 0,
+                        thieuChuHo: 0,
+                        thieuCaHai: 0,
+                        saiDinhDang: 0  // THÊM: CCCD sai định dạng
+                    };
                 }
 
                 xaStats[key].total++;
                 if (isBlank(item.CCCD)) xaStats[key].thieuCCCD++;
                 if (isBlank(item.ChuHo)) xaStats[key].thieuChuHo++;
                 if (isBlank(item.CCCD) && isBlank(item.ChuHo)) xaStats[key].thieuCaHai++;
+
+                // THÊM: Kiểm tra CCCD sai định dạng
+                if (item.SaiDinhDang === 'Y' || item.SaiDinhDang === true) {
+                    xaStats[key].saiDinhDang++;
+                }
             });
 
             const xaTableBody = document.getElementById('xaTableBody');
@@ -1298,13 +1471,14 @@
             Object.values(xaStats).forEach(stats => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${stats.xaName}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${stats.huyenName}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${stats.total}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">${stats.thieuCCCD} (${stats.total > 0 ? ((stats.thieuCCCD / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-600">${stats.thieuChuHo} (${stats.total > 0 ? ((stats.thieuChuHo / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-purple-600">${stats.thieuCaHai} (${stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
-            `;
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${stats.xaName}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${stats.total}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">${stats.thieuCCCD} (${stats.total > 0 ? ((stats.thieuCCCD / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-600">${stats.thieuChuHo} (${stats.total > 0 ? ((stats.thieuChuHo / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-purple-600">${stats.thieuCaHai} (${stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-orange-600">${stats.saiDinhDang} (${stats.total > 0 ? ((stats.saiDinhDang / stats.total) * 100).toFixed(1) : '0.0'}%)</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${stats.huyenName}</td>
+        `;
                 xaTableBody.appendChild(row);
             });
         }
@@ -1332,15 +1506,29 @@
                     return soNhaA.localeCompare(soNhaB, 'vi-VN', { numeric: true });
                 });
 
+            // THÊM: Danh sách CCCD sai định dạng
+            const danhSachSaiDinhDang = data.filter(item => item.SaiDinhDang === 'Y' || item.SaiDinhDang === true)
+                .sort((a, b) => {
+                    const soNhaA = (a.SoNha || '').toString().toLowerCase();
+                    const soNhaB = (b.SoNha || '').toString().toLowerCase();
+                    return soNhaA.localeCompare(soNhaB, 'vi-VN', { numeric: true });
+                });
+
             // Update counts
             document.getElementById('countThieuCCCD').textContent = `${danhSachThieuCCCD.length} nhà`;
             document.getElementById('countThieuChuHo').textContent = `${danhSachThieuChuHo.length} nhà`;
             document.getElementById('countThieuCaHai').textContent = `${danhSachThieuCaHai.length} nhà`;
 
+            // THÊM: Update count cho CCCD sai định dạng
+            document.getElementById('countSaiDinhDang').textContent = `${danhSachSaiDinhDang.length} nhà`;
+
             // Update tables
             updateDetailTable('danhSachThieuCCCD', danhSachThieuCCCD, 'thieuCCCD');
             updateDetailTable('danhSachThieuChuHo', danhSachThieuChuHo, 'thieuChuHo');
             updateDetailTable('danhSachThieuCaHai', danhSachThieuCaHai, 'thieuCaHai');
+
+            // THÊM: Update table cho CCCD sai định dạng
+            updateDetailTable('danhSachSaiDinhDang', danhSachSaiDinhDang, 'saiDinhDang');
         }
 
         function updateDetailTable(tableId, data, type) {
@@ -1349,16 +1537,17 @@
 
             if (data.length === 0) {
                 const row = document.createElement('tr');
+                const colSpan = type === 'saiDinhDang' ? '8' : '7'; // CCCD sai định dạng có thêm 1 cột
                 row.innerHTML = `
-                <td colspan="7" class="px-6 py-8 text-center text-gray-500">
-                    <div class="flex flex-col items-center">
-                        <svg class="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        <p>Không có dữ liệu</p>
-                    </div>
-                </td>
-            `;
+            <td colspan="${colSpan}" class="px-6 py-8 text-center text-gray-500">
+                <div class="flex flex-col items-center">
+                    <svg class="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p>Không có dữ liệu</p>
+                </div>
+            </td>
+        `;
                 tableBody.appendChild(row);
                 return;
             }
@@ -1374,35 +1563,48 @@
 
                 if (type === 'thieuCCCD') {
                     row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.SoNha || ''}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.ChuHo || 'Trống'}</td>
-                    <td class="px-6 py-4 text-sm text-red-600">Thiếu CCCD</td>
-                `;
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.SoNha || ''}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.ChuHo || 'Trống'}</td>
+                <td class="px-6 py-4 text-sm text-red-600">Thiếu CCCD</td>
+            `;
                 } else if (type === 'thieuChuHo') {
                     row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.SoNha || ''}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.CCCD || 'Trống'}</td>
-                    <td class="px-6 py-4 text-sm text-yellow-600">Thiếu Chủ hộ</td>
-                `;
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.SoNha || ''}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.CCCD || 'Trống'}</td>
+                <td class="px-6 py-4 text-sm text-yellow-600">Thiếu Chủ hộ</td>
+            `;
                 } else if (type === 'thieuCaHai') {
                     row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.SoNha || ''}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">CCCD & Chủ hộ</td>
-                    <td class="px-6 py-4 text-sm text-purple-600">Thiếu cả hai</td>
-                `;
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.SoNha || ''}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">CCCD & Chủ hộ</td>
+                <td class="px-6 py-4 text-sm text-purple-600">Thiếu cả hai</td>
+            `;
+                } else if (type === 'saiDinhDang') {
+                    // THÊM: Xử lý cho CCCD sai định dạng
+                    row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.SoNha || ''}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.ChuHo || 'Trống'}</td>
+                <td class="px-6 py-4 text-sm text-orange-600">CCCD sai định dạng (${(item.CCCD || '').length} ký tự)</td>
+            `;
                 }
+
+                // <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-mono">${item.CCCD || 'Trống'}</td> dòng này ở trên
 
                 tableBody.appendChild(row);
             });
@@ -1423,6 +1625,7 @@
         }
 
         // Hàm xuất báo cáo tổng hợp (existing function)
+        // Hàm xuất báo cáo tổng hợp - ENHANCED VERSION WITH CCCD SAI DINH DANG
         function exportSummaryReport() {
             try {
                 const huyenFilter = document.getElementById('huyenSelect').value;
@@ -1438,20 +1641,31 @@
 
                 const wb = XLSX.utils.book_new();
 
-                // Sheet 1: Tổng hợp theo Huyện
+                // Sheet 1: Tổng hợp theo Huyện - ENHANCED WITH CCCD SAI DINH DANG
                 const huyenStats = {};
                 filteredData.forEach(item => {
                     const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
                     const huyenName = huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định');
 
                     if (!huyenStats[huyenName]) {
-                        huyenStats[huyenName] = { total: 0, thieuCCCD: 0, thieuChuHo: 0, thieuCaHai: 0 };
+                        huyenStats[huyenName] = {
+                            total: 0,
+                            thieuCCCD: 0,
+                            thieuChuHo: 0,
+                            thieuCaHai: 0,
+                            saiDinhDang: 0  // THÊM: CCCD sai định dạng
+                        };
                     }
 
                     huyenStats[huyenName].total++;
                     if (isBlank(item.CCCD)) huyenStats[huyenName].thieuCCCD++;
                     if (isBlank(item.ChuHo)) huyenStats[huyenName].thieuChuHo++;
                     if (isBlank(item.CCCD) && isBlank(item.ChuHo)) huyenStats[huyenName].thieuCaHai++;
+
+                    // THÊM: Kiểm tra CCCD sai định dạng
+                    if (item.SaiDinhDang === 'Y' || item.SaiDinhDang === true) {
+                        huyenStats[huyenName].saiDinhDang++;
+                    }
                 });
 
                 const huyenData_export = Object.entries(huyenStats).map(([huyenName, stats]) => ({
@@ -1462,13 +1676,16 @@
                     'Thiếu Chủ hộ': stats.thieuChuHo,
                     'Tỷ lệ thiếu Chủ hộ (%)': stats.total > 0 ? ((stats.thieuChuHo / stats.total) * 100).toFixed(1) : '0',
                     'Thiếu cả hai': stats.thieuCaHai,
-                    'Tỷ lệ thiếu cả hai (%)': stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0'
+                    'Tỷ lệ thiếu cả hai (%)': stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0',
+                    // THÊM: CCCD sai định dạng columns
+                    'CCCD sai định dạng': stats.saiDinhDang,
+                    'Tỷ lệ sai định dạng (%)': stats.total > 0 ? ((stats.saiDinhDang / stats.total) * 100).toFixed(1) : '0'
                 }));
 
                 const ws1 = XLSX.utils.json_to_sheet(huyenData_export);
                 XLSX.utils.book_append_sheet(wb, ws1, "Tổng hợp theo Huyện");
 
-                // Sheet 2: Tổng hợp theo Xã
+                // Sheet 2: Tổng hợp theo Xã - ENHANCED WITH CCCD SAI DINH DANG
                 const xaStats = {};
                 filteredData.forEach(item => {
                     const xaInfo = xaPhuongData.find(x => x.MaXa === item.MaXa);
@@ -1478,13 +1695,26 @@
 
                     const key = `${xaName}_${huyenName}`;
                     if (!xaStats[key]) {
-                        xaStats[key] = { xaName, huyenName, total: 0, thieuCCCD: 0, thieuChuHo: 0, thieuCaHai: 0 };
+                        xaStats[key] = {
+                            xaName,
+                            huyenName,
+                            total: 0,
+                            thieuCCCD: 0,
+                            thieuChuHo: 0,
+                            thieuCaHai: 0,
+                            saiDinhDang: 0  // THÊM: CCCD sai định dạng
+                        };
                     }
 
                     xaStats[key].total++;
                     if (isBlank(item.CCCD)) xaStats[key].thieuCCCD++;
                     if (isBlank(item.ChuHo)) xaStats[key].thieuChuHo++;
                     if (isBlank(item.CCCD) && isBlank(item.ChuHo)) xaStats[key].thieuCaHai++;
+
+                    // THÊM: Kiểm tra CCCD sai định dạng
+                    if (item.SaiDinhDang === 'Y' || item.SaiDinhDang === true) {
+                        xaStats[key].saiDinhDang++;
+                    }
                 });
 
                 const xaData_export = Object.values(xaStats).map(stats => ({
@@ -1496,24 +1726,33 @@
                     'Thiếu Chủ hộ': stats.thieuChuHo,
                     'Tỷ lệ thiếu Chủ hộ (%)': stats.total > 0 ? ((stats.thieuChuHo / stats.total) * 100).toFixed(1) : '0',
                     'Thiếu cả hai': stats.thieuCaHai,
-                    'Tỷ lệ thiếu cả hai (%)': stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0'
+                    'Tỷ lệ thiếu cả hai (%)': stats.total > 0 ? ((stats.thieuCaHai / stats.total) * 100).toFixed(1) : '0',
+                    // THÊM: CCCD sai định dạng columns
+                    'CCCD sai định dạng': stats.saiDinhDang,
+                    'Tỷ lệ sai định dạng (%)': stats.total > 0 ? ((stats.saiDinhDang / stats.total) * 100).toFixed(1) : '0'
                 }));
 
                 const ws2 = XLSX.utils.json_to_sheet(xaData_export);
                 XLSX.utils.book_append_sheet(wb, ws2, "Tổng hợp theo Xã");
 
-                // Sheet 3: Thống kê tổng quan
+                // Sheet 3: Thống kê tổng quan - ENHANCED WITH CCCD SAI DINH DANG
                 const total = filteredData.length;
                 const thieuCCCD = filteredData.filter(item => isBlank(item.CCCD)).length;
                 const thieuChuHo = filteredData.filter(item => isBlank(item.ChuHo)).length;
                 const thieuCaHai = filteredData.filter(item => isBlank(item.CCCD) && isBlank(item.ChuHo)).length;
-                const dayDu = total - thieuCCCD - thieuChuHo + thieuCaHai;
+
+                // THÊM: Thống kê CCCD sai định dạng
+                const saiDinhDang = filteredData.filter(item => item.SaiDinhDang === 'Y' || item.SaiDinhDang === true).length;
+
+                const dayDu = total - thieuCCCD - thieuChuHo - saiDinhDang + thieuCaHai;
 
                 const tongQuanData = [
                     { 'Chỉ tiêu': 'Tổng số nhà', 'Số lượng': total, 'Tỷ lệ (%)': '100.0' },
                     { 'Chỉ tiêu': 'Nhà thiếu CCCD', 'Số lượng': thieuCCCD, 'Tỷ lệ (%)': total > 0 ? ((thieuCCCD / total) * 100).toFixed(1) : '0' },
                     { 'Chỉ tiêu': 'Nhà thiếu Chủ hộ', 'Số lượng': thieuChuHo, 'Tỷ lệ (%)': total > 0 ? ((thieuChuHo / total) * 100).toFixed(1) : '0' },
                     { 'Chỉ tiêu': 'Nhà thiếu cả hai', 'Số lượng': thieuCaHai, 'Tỷ lệ (%)': total > 0 ? ((thieuCaHai / total) * 100).toFixed(1) : '0' },
+                    // THÊM: CCCD sai định dạng
+                    { 'Chỉ tiêu': 'CCCD sai định dạng', 'Số lượng': saiDinhDang, 'Tỷ lệ (%)': total > 0 ? ((saiDinhDang / total) * 100).toFixed(1) : '0' },
                     { 'Chỉ tiêu': 'Nhà đầy đủ thông tin', 'Số lượng': dayDu, 'Tỷ lệ (%)': total > 0 ? ((dayDu / total) * 100).toFixed(1) : '0' }
                 ];
 
@@ -1627,17 +1866,47 @@
                     XLSX.utils.book_append_sheet(wb, ws3, "Danh sách thiếu cả hai");
                 }
 
+                // Sheet 4: Danh sách CCCD sai định dạng
+                const danhSachSaiDinhDang = filteredData.filter(item => item.SaiDinhDang === 'Y' || item.SaiDinhDang === true)
+                    .sort((a, b) => {
+                        const soNhaA = (a.SoNha || '').toString().toLowerCase();
+                        const soNhaB = (b.SoNha || '').toString().toLowerCase();
+                        return soNhaA.localeCompare(soNhaB, 'vi-VN', { numeric: true });
+                    })
+                    .map((item, index) => {
+                        const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                        const xaInfo = xaPhuongData.find(x => x.MaXa === item.MaXa);
+                        return {
+                            'STT': index + 1,
+                            'Số nhà': item.SoNha || '',
+                            'Địa chỉ': item.MaTuyen || '',
+                            'Xã/Phường': xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định'),
+                            'Huyện': huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định'),
+                            'CCCD hiện tại': item.CCCD || 'Trống',
+                            'Chủ hộ': item.ChuHo || 'Trống',
+                            'Số ký tự CCCD': (item.CCCD || '').length,
+                            'Ghi chú': 'CCCD sai định dạng'
+                        };
+                    });
+
+                if (danhSachSaiDinhDang.length > 0) {
+                    const ws4 = XLSX.utils.json_to_sheet(danhSachSaiDinhDang);
+                    XLSX.utils.book_append_sheet(wb, ws4, "CCCD sai định dạng");
+                }
+
                 // Kiểm tra xem có dữ liệu nào để xuất không
                 if (wb.SheetNames.length === 0) {
                     showNotification('Không có dữ liệu thiếu thông tin để xuất!', 'warning');
                     return;
                 }
 
-                // Thêm sheet tổng hợp số liệu
+                // Thêm sheet tổng hợp số liệu - ENHANCED VERSION
                 const summaryData = [
                     { 'Loại thiếu': 'Thiếu CCCD', 'Số lượng': danhSachThieuCCCD.length },
                     { 'Loại thiếu': 'Thiếu Chủ hộ', 'Số lượng': danhSachThieuChuHo.length },
-                    { 'Loại thiếu': 'Thiếu cả hai', 'Số lượng': danhSachThieuCaHai.length }
+                    { 'Loại thiếu': 'Thiếu cả hai', 'Số lượng': danhSachThieuCaHai.length },
+                    // THÊM: CCCD sai định dạng
+                    { 'Loại thiếu': 'CCCD sai định dạng', 'Số lượng': danhSachSaiDinhDang.length }
                 ];
 
                 const wsSummary = XLSX.utils.json_to_sheet(summaryData);
