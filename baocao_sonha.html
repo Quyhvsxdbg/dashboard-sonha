@@ -430,10 +430,11 @@
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-900">Tổng hợp theo Huyện</h3>
                     </div>
-                    <div class="overflow-x-auto">
+                    <!-- THÊM các class này để có chiều cao cố định và scroll -->
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <!-- Cập nhật header bảng Huyện -->
-                            <thead class="bg-gray-50">
+                            <thead class="bg-gray-50 sticky top-0">
                                 <tr>
                                     <th
                                         class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -468,14 +469,14 @@
                     <div class="px-6 py-4 border-b border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-900">Chi tiết theo Xã</h3>
                     </div>
-                    <div class="overflow-x-auto">
+                    <!-- THÊM các class này để có chiều cao cố định và scroll -->
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
                         <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                            <thead class="bg-gray-50 sticky top-0">
                                 <tr>
                                     <th
                                         class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Xã</th>
-
                                     <th
                                         class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Tổng số</th>
@@ -1198,9 +1199,7 @@
                 XLSX.utils.book_append_sheet(wb, ws3, "III. THỐNG KÊ TỔNG QUAN");
 
                 // Export file
-                const locationSuffix = huyenFilter ?
-                    huyenData.find(h => h.MaHuyen === huyenFilter)?.QuanHuyen || huyenFilter :
-                    'BacGiang';
+                const locationSuffix = huyenFilter ? huyenData.find(h => h.MaHuyen === huyenFilter)?.QuanHuyen || huyenFilter : '';
                 const fileName = createFileName(`TongQuan_ThuThapDuLieu_${locationSuffix}`);
                 XLSX.writeFile(wb, fileName);
 
@@ -1760,7 +1759,7 @@
                 XLSX.utils.book_append_sheet(wb, ws3, "Thống kê tổng quan");
 
                 // Xuất file
-                const fileName = createFileName('BaoCao_TongHop_SoNha_BacGiang');
+                const fileName = createFileName('BaoCao_TongHop_SoNha');
                 XLSX.writeFile(wb, fileName);
 
                 // Hiển thị thông báo thành công
@@ -1773,6 +1772,7 @@
         }
 
         // Hàm xuất danh sách chi tiết thiếu thông tin (existing function)
+        // Hàm xuất danh sách chi tiết thiếu thông tin - ENHANCED VERSION WITH COMPLETE DATA
         function exportDetailReport() {
             try {
                 const huyenFilter = document.getElementById('huyenSelect').value;
@@ -1894,30 +1894,62 @@
                     XLSX.utils.book_append_sheet(wb, ws4, "CCCD sai định dạng");
                 }
 
+                // NEW SHEET 5: Danh sách đầy đủ thông tin (có cả CCCD và Chủ hộ đúng định dạng)
+                const danhSachDayDu = filteredData.filter(item =>
+                    isNotBlank(item.CCCD) &&
+                    isNotBlank(item.ChuHo) &&
+                    (item.SaiDinhDang !== 'Y' && item.SaiDinhDang !== true)
+                )
+                    .sort((a, b) => {
+                        const soNhaA = (a.SoNha || '').toString().toLowerCase();
+                        const soNhaB = (b.SoNha || '').toString().toLowerCase();
+                        return soNhaA.localeCompare(soNhaB, 'vi-VN', { numeric: true });
+                    })
+                    .map((item, index) => {
+                        const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                        const xaInfo = xaPhuongData.find(x => x.MaXa === item.MaXa);
+                        return {
+                            'STT': index + 1,
+                            'Số nhà': item.SoNha || '',
+                            'Địa chỉ': item.MaTuyen || '',
+                            'Xã/Phường': xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định'),
+                            'Huyện': huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định'),
+                            'CCCD': item.CCCD || '',
+                            'Chủ hộ': item.ChuHo || '',
+                            'Ghi chú': 'Đầy đủ và đúng định dạng'
+                        };
+                    });
+
+                if (danhSachDayDu.length > 0) {
+                    const ws5 = XLSX.utils.json_to_sheet(danhSachDayDu);
+                    XLSX.utils.book_append_sheet(wb, ws5, "Danh sách đầy đủ thông tin");
+                }
+
                 // Kiểm tra xem có dữ liệu nào để xuất không
                 if (wb.SheetNames.length === 0) {
-                    showNotification('Không có dữ liệu thiếu thông tin để xuất!', 'warning');
+                    showNotification('Không có dữ liệu để xuất!', 'warning');
                     return;
                 }
 
                 // Thêm sheet tổng hợp số liệu - ENHANCED VERSION
                 const summaryData = [
-                    { 'Loại thiếu': 'Thiếu CCCD', 'Số lượng': danhSachThieuCCCD.length },
-                    { 'Loại thiếu': 'Thiếu Chủ hộ', 'Số lượng': danhSachThieuChuHo.length },
-                    { 'Loại thiếu': 'Thiếu cả hai', 'Số lượng': danhSachThieuCaHai.length },
-                    // THÊM: CCCD sai định dạng
-                    { 'Loại thiếu': 'CCCD sai định dạng', 'Số lượng': danhSachSaiDinhDang.length }
+                    { 'Loại dữ liệu': 'Thiếu CCCD', 'Số lượng': danhSachThieuCCCD.length },
+                    { 'Loại dữ liệu': 'Thiếu Chủ hộ', 'Số lượng': danhSachThieuChuHo.length },
+                    { 'Loại dữ liệu': 'Thiếu cả hai', 'Số lượng': danhSachThieuCaHai.length },
+                    { 'Loại dữ liệu': 'CCCD sai định dạng', 'Số lượng': danhSachSaiDinhDang.length },
+                    { 'Loại dữ liệu': 'Đầy đủ thông tin', 'Số lượng': danhSachDayDu.length },
+                    { 'Loại dữ liệu': 'TỔNG CỘNG', 'Số lượng': filteredData.length }
                 ];
 
                 const wsSummary = XLSX.utils.json_to_sheet(summaryData);
                 XLSX.utils.book_append_sheet(wb, wsSummary, "Tổng hợp");
 
                 // Xuất file
-                const fileName = createFileName('BaoCao_ChiTiet_ThieuThongTin_BacGiang');
+                const fileName = createFileName('BaoCao_ChiTiet_SoNha');
                 XLSX.writeFile(wb, fileName);
 
                 // Hiển thị thông báo thành công
-                showNotification('Xuất báo cáo chi tiết thành công!', 'success');
+                showNotification(`Xuất báo cáo chi tiết thành công!`, 'success');
 
             } catch (error) {
                 console.error('Lỗi xuất Excel:', error);
