@@ -310,7 +310,7 @@
                                     d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                 </path>
                             </svg>
-                            Xuất Chi tiết thiếu
+                            Xuất Chi tiết
                         </button>
                     </div>
                 </div>
@@ -1567,7 +1567,7 @@
                 <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.ChuHo || 'Trống'}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.ChuHo || ''}</td>
                 <td class="px-6 py-4 text-sm text-red-600">Thiếu CCCD</td>
             `;
                 } else if (type === 'thieuChuHo') {
@@ -1577,7 +1577,7 @@
                 <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.CCCD || 'Trống'}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.CCCD || ''}</td>
                 <td class="px-6 py-4 text-sm text-yellow-600">Thiếu Chủ hộ</td>
             `;
                 } else if (type === 'thieuCaHai') {
@@ -1598,12 +1598,12 @@
                 <td class="px-6 py-4 text-sm text-gray-900">${item.MaTuyen || ''}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${xaName}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${huyenName}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.ChuHo || 'Trống'}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.ChuHo || ''}</td>
                 <td class="px-6 py-4 text-sm text-orange-600">CCCD sai định dạng (${(item.CCCD || '').length} ký tự)</td>
             `;
                 }
 
-                // <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-mono">${item.CCCD || 'Trống'}</td> dòng này ở trên
+                // <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-mono">${item.CCCD || ''}</td> dòng này ở trên
 
                 tableBody.appendChild(row);
             });
@@ -1788,6 +1788,75 @@
 
                 const wb = XLSX.utils.book_new();
 
+                // THÊM SHEET MỚI: Tất cả dữ liệu (đặt ở đầu)
+                const tatCaDuLieu = filteredData
+                    .sort((a, b) => {
+                        // Sắp xếp theo Huyện, rồi Xã, rồi Số nhà
+                        const huyenA = huyenData.find(h => h.MaHuyen === a.MaHuyen)?.QuanHuyen || '';
+                        const huyenB = huyenData.find(h => h.MaHuyen === b.MaHuyen)?.QuanHuyen || '';
+
+                        if (huyenA !== huyenB) {
+                            return huyenA.localeCompare(huyenB, 'vi-VN');
+                        }
+
+                        const xaA = xaPhuongData.find(x => x.MaXa === a.MaXa)?.TenXa || '';
+                        const xaB = xaPhuongData.find(x => x.MaXa === b.MaXa)?.TenXa || '';
+
+                        if (xaA !== xaB) {
+                            return xaA.localeCompare(xaB, 'vi-VN');
+                        }
+
+                        const soNhaA = (a.SoNha || '').toString().toLowerCase();
+                        const soNhaB = (b.SoNha || '').toString().toLowerCase();
+                        return soNhaA.localeCompare(soNhaB, 'vi-VN', { numeric: true });
+                    })
+                    .map((item, index) => {
+                        const huyenInfo = huyenData.find(h => h.MaHuyen === item.MaHuyen);
+                        const xaInfo = xaPhuongData.find(x => x.MaXa === item.MaXa);
+
+                        // Xác định trạng thái
+                        let trangThai = '';
+                        let ghiChu = '';
+
+                        const thieuCCCD = isBlank(item.CCCD);
+                        const thieuChuHo = isBlank(item.ChuHo);
+                        const saiDinhDang = item.SaiDinhDang === 'Y' || item.SaiDinhDang === true;
+
+                        if (thieuCCCD && thieuChuHo) {
+                            trangThai = 'Thiếu cả hai';
+                            ghiChu = 'Thiếu CCCD và Chủ hộ';
+                        } else if (thieuCCCD) {
+                            trangThai = 'Thiếu CCCD';
+                            ghiChu = 'Thiếu CCCD';
+                        } else if (thieuChuHo) {
+                            trangThai = 'Thiếu Chủ hộ';
+                            ghiChu = 'Thiếu Chủ hộ';
+                        } else if (saiDinhDang) {
+                            trangThai = 'CCCD sai định dạng';
+                            ghiChu = `CCCD sai định dạng (${(item.CCCD || '').length} ký tự)`;
+                        } else {
+                            trangThai = 'Đầy đủ';
+                            ghiChu = 'Đầy đủ và đúng định dạng';
+                        }
+
+                        return {
+                            'STT': index + 1,
+                            'Số nhà': item.SoNha || '',
+                            'Địa chỉ': item.MaTuyen || '',
+                            'Xã/Phường': xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định'),
+                            'Huyện': huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định'),
+                            'CCCD': item.CCCD || '',
+                            'Chủ hộ': item.ChuHo || '',
+                            'Trạng thái': trangThai,
+                            'Ghi chú': ghiChu
+                        };
+                    });
+
+                if (tatCaDuLieu.length > 0) {
+                    const wsAll = XLSX.utils.json_to_sheet(tatCaDuLieu);
+                    XLSX.utils.book_append_sheet(wb, wsAll, "Danh sách tổng hợp");
+                }
+
                 // Sheet 1: Danh sách thiếu CCCD
                 const danhSachThieuCCCD = filteredData.filter(item => isBlank(item.CCCD))
                     .sort((a, b) => {
@@ -1804,7 +1873,7 @@
                             'Địa chỉ': item.MaTuyen || '',
                             'Xã/Phường': xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định'),
                             'Huyện': huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định'),
-                            'Chủ hộ': item.ChuHo || 'Trống',
+                            'Chủ hộ': item.ChuHo || '',
                             'Ghi chú': 'Thiếu CCCD'
                         };
                     });
@@ -1830,7 +1899,7 @@
                             'Địa chỉ': item.MaTuyen || '',
                             'Xã/Phường': xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định'),
                             'Huyện': huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định'),
-                            'CCCD': item.CCCD || 'Trống',
+                            'CCCD': item.CCCD || '',
                             'Ghi chú': 'Thiếu Chủ hộ'
                         };
                     });
@@ -1882,8 +1951,8 @@
                             'Địa chỉ': item.MaTuyen || '',
                             'Xã/Phường': xaInfo ? xaInfo.TenXa : (item.MaXa || 'Không xác định'),
                             'Huyện': huyenInfo ? huyenInfo.QuanHuyen : (item.MaHuyen || 'Không xác định'),
-                            'CCCD hiện tại': item.CCCD || 'Trống',
-                            'Chủ hộ': item.ChuHo || 'Trống',
+                            'CCCD hiện tại': item.CCCD || '',
+                            'Chủ hộ': item.ChuHo || '',
                             'Số ký tự CCCD': (item.CCCD || '').length,
                             'Ghi chú': 'CCCD sai định dạng'
                         };
@@ -1894,7 +1963,7 @@
                     XLSX.utils.book_append_sheet(wb, ws4, "CCCD sai định dạng");
                 }
 
-                // NEW SHEET 5: Danh sách đầy đủ thông tin (có cả CCCD và Chủ hộ đúng định dạng)
+                // Sheet 5: Danh sách đầy đủ thông tin (có cả CCCD và Chủ hộ đúng định dạng)
                 const danhSachDayDu = filteredData.filter(item =>
                     isNotBlank(item.CCCD) &&
                     isNotBlank(item.ChuHo) &&
@@ -1922,7 +1991,7 @@
 
                 if (danhSachDayDu.length > 0) {
                     const ws5 = XLSX.utils.json_to_sheet(danhSachDayDu);
-                    XLSX.utils.book_append_sheet(wb, ws5, "Danh sách đầy đủ thông tin");
+                    XLSX.utils.book_append_sheet(wb, ws5, "Danh sách đủ cả hai");
                 }
 
                 // Kiểm tra xem có dữ liệu nào để xuất không
@@ -1933,12 +2002,12 @@
 
                 // Thêm sheet tổng hợp số liệu - ENHANCED VERSION
                 const summaryData = [
+                    { 'Loại dữ liệu': 'Tổng số nhà', 'Số lượng': filteredData.length },
                     { 'Loại dữ liệu': 'Thiếu CCCD', 'Số lượng': danhSachThieuCCCD.length },
                     { 'Loại dữ liệu': 'Thiếu Chủ hộ', 'Số lượng': danhSachThieuChuHo.length },
                     { 'Loại dữ liệu': 'Thiếu cả hai', 'Số lượng': danhSachThieuCaHai.length },
                     { 'Loại dữ liệu': 'CCCD sai định dạng', 'Số lượng': danhSachSaiDinhDang.length },
-                    { 'Loại dữ liệu': 'Đầy đủ thông tin', 'Số lượng': danhSachDayDu.length },
-                    { 'Loại dữ liệu': 'TỔNG CỘNG', 'Số lượng': filteredData.length }
+                    { 'Loại dữ liệu': 'Đầy đủ thông tin', 'Số lượng': danhSachDayDu.length }
                 ];
 
                 const wsSummary = XLSX.utils.json_to_sheet(summaryData);
